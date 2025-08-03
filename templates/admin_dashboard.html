@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🎟️ Панель управления билетами</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f1f3f5;
+            padding: 50px;
+            text-align: center;
+        }
+        .card {
+            display: inline-block;
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 250px;
+            transition: transform 0.2s ease;
+        }
+        .card:hover {
+            transform: scale(1.03);
+        }
+        a {
+            text-decoration: none;
+            color: #2d3436;
+        }
+        h1 {
+            margin-bottom: 40px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #0984e3;
+            color: white;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎟️ Админ-панель управления билетами</h1>
+    <div class="grid">
+        <div class="card">
+            <h3>📤 Загрузить билет</h3>
+            <a class="btn" href="/docs#/Tickets/create_ticket_tickets_create_post">Перейти</a>
+        </div>
+        <div class="card">
+            <h3>🔍 Поиск билета</h3>
+            <a class="btn" href="/tickets/search/html">Открыть</a>
+        </div>
+        <div class="card">
+            <h3>🏆 Победители</h3>
+            <a class="btn" href="/tickets/winners/html">Список</a>
+        </div>
+        <div class="card">
+            <h3>✨ Назначить победителя</h3>
+            <a class="btn" href="/docs#/Tickets/declare_winner_tickets__ticket_number__winner_put">Перейти</a>
+        </div>
+    </div>
+</body>
+</html>
