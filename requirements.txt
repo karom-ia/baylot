@@ -1,7 +1,5 @@
-echo fastapi > requirements.txt
-echo uvicorn >> requirements.txt
-echo fastapi > requirements.txt
-echo uvicorn >> requirements.txt
-echo jinja2 >> requirements.txt
-echo aiofiles >> requirements.txt
-echo python-multipart >> requirements.txt
+fastapi
+uvicorn
+jinja2
+aiofiles
+python-multipart
