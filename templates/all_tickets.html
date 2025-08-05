@@ -679,11 +679,9 @@ input.shake {
   <div class="header-container">
     <div class="header-left">
       <img src="/static/images/baylot-main-logo.png" alt="Logo" style="height: 50px; border-radius: 12px;">
-      
+      <button id="newTicketsBtn" class="new-tickets-button" onclick="location.reload()" class="header-title interactive-title">
   <strong>Metabase</strong>
-  <button id="newTicketsBtn" class="new-tickets-button" onclick="location.reload()">
-  <small>all tickets</small>
-
+  <small>tickets</small>
 </a>
       <div class="header-tag" id="ticket-count-display">{{ tickets|length }} tickets</div>
     </div>
