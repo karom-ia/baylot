@@ -1,57 +1,48 @@
 # app/main.py
 
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from app.utils.template_engine import templates
+from app.database.db import Base, engine
+from app.models.ticket import Ticket
+from app.routers import ticket
+from app.utils.country_names import country_name_map
+
+def get_country_name(code: str):
+    """
+    Возвращает полное название страны по её коду.
+    """
+    return country_name_map.get(code.upper(), code)
+
+# Применяем фильтр к шаблонам Jinja2
+templates.env.filters["country_name"] = get_country_name
 
 app = FastAPI()
 
-# This is the root URL handler, which will serve your website's main page.
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    """
-    Handles requests to the root URL (e.g., http://www.metabase.info/)
-    It returns a simple HTML string for the main page.
-    """
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Главная страница Metabase.info</title>
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-        <div class="bg-white p-8 rounded-lg shadow-md text-center">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">Добро пожаловать на Metabase.info!</h1>
-            <p class="text-gray-600 mb-4">Это ваша главная страница.</p>
-            <p class="text-gray-600">Чтобы перейти на дашборд, пожалуйста, посетите <a href="/dashboard" class="text-blue-500 hover:underline">/dashboard</a></p>
-        </div>
-    </body>
-    </html>
-    """
-    return html_content
+# Создание таблиц в базе данных
+Base.metadata.create_all(bind=engine)
 
-# This is the handler for the dashboard page.
-# You can keep this or delete it if the dashboard is no longer needed.
-@app.get("/dashboard", response_class=HTMLResponse)
-async def read_dashboard():
-    """
-    Handles requests to the dashboard URL (e.g., http://www.metabase.info/dashboard)
-    This will serve the ticket management dashboard page.
-    """
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Админ-панель управления билетами</title>
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    </head>
-    <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-        <div class="bg-white p-8 rounded-lg shadow-md text-center">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">Админ-панель управления билетами</h1>
-            <p class="text-gray-600">Это дашборд, который вы видели ранее.</p>
-            <p class="text-gray-600">Чтобы вернуться на главную, пожалуйста, посетите <a href="/" class="text-blue-500 hover:underline">/</a></p>
-        </div>
-    </body>
-    </html>
-    """
-    return html_content
+# Подключение роутеров
+app.include_router(ticket.router)
+
+# Подключение статических файлов (CSS, JS, изображения)
+# Файлы из папки `static` будут доступны по URL /static/...
+app.mount("/static", StaticFiles(directory="static"), name="static")
+# Файлы из папки `uploaded_tickets` будут доступны по URL /uploaded_tickets/...
+app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
+
+
+# ---- ИЗМЕНЁННЫЙ КОД: ТЕПЕРЬ ГЛАВНАЯ СТРАНИЦА ПОКАЗЫВАЕТ HTML ----
+
+# Корень: отображает ваш главный HTML-файл (admin_dashboard.html)
+@app.get("/")
+async def read_root(request: Request):
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
+# ------------------------------------------------------------------
+
+# Админка: этот маршрут уже был настроен правильно
+@app.get("/admin")
+async def admin_dashboard(request: Request):
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
