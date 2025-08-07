@@ -8,6 +8,8 @@ from app.database.db import Base, engine
 from app.models.ticket import Ticket
 from app.routers import ticket
 from app.utils.country_names import country_name_map
+from sqlalchemy.orm import Session
+from app.database.db import get_db
 
 def get_country_name(code: str):
     """
@@ -15,47 +17,88 @@ def get_country_name(code: str):
     """
     return country_name_map.get(code.upper(), code)
 
-# Объявляем, где находятся ваши HTML-файлы
-# Убедитесь, что папка 'templates' существует и содержит ваши HTML-файлы.
 templates = Jinja2Templates(directory="templates")
-
-# Применяем фильтр к шаблонам Jinja2
 templates.env.filters["country_name"] = get_country_name
 
 app = FastAPI()
 
-# Создание таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
-# Подключение роутеров
 app.include_router(ticket.router)
 
-# Подключение статических файлов (CSS, JS, изображения)
-# Файлы из папки `static` будут доступны по URL /static/...
 app.mount("/static", StaticFiles(directory="static"), name="static")
-# Файлы из папки `uploaded_tickets` будут доступны по URL /uploaded_tickets/...
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
 
-
-# ---- ИЗМЕНЁННЫЙ КОД: ГЛАВНАЯ СТРАНИЦА ПОКАЗЫВАЕТ ВАШ ОСНОВНОЙ САЙТ (all_tickets.html) ----
-
-# Корень: отображает ваш основной HTML-файл (all_tickets.html)
+# Измененный корневой маршрут - теперь он получает билеты из базы данных
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    """
-    Обрабатывает запросы к корневому URL (например, http://www.metabase.info/).
-    Возвращает ваш основной HTML-файл сайта (all_tickets.html).
-    """
-    return templates.TemplateResponse("all_tickets.html", {"request": request})
+    db: Session = next(get_db())
+    try:
+        # Получаем все билеты из базы данных
+        tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
+        
+        # Получаем билеты-победители для выделенного отображения
+        featured_tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.id.desc()).all()
+        
+        return templates.TemplateResponse(
+            "all_tickets.html",
+            {
+                "request": request,
+                "tickets": tickets,
+                "featured_tickets": featured_tickets,
+                "winners_only": False
+            }
+        )
+    finally:
+        db.close()
 
-# -------------------------------------------------------------------------------------
+# Маршрут для поиска билетов
+@app.get("/tickets/all/html", response_class=HTMLResponse)
+async def all_tickets_html(
+    request: Request,
+    number: str = None,
+    winners_only: bool = False
+):
+    db: Session = next(get_db())
+    try:
+        query = db.query(Ticket)
+        found = None
+        
+        if number:
+            query = query.filter(Ticket.ticket_number.contains(number))
+            found = query.first() is not None
+        
+        if winners_only:
+            query = query.filter(Ticket.is_winner == True)
+        
+        tickets = query.order_by(Ticket.id.desc()).all()
+        featured_tickets = []
+        
+        return templates.TemplateResponse(
+            "all_tickets.html",
+            {
+                "request": request,
+                "tickets": tickets,
+                "featured_tickets": featured_tickets,
+                "winners_only": winners_only,
+                "number": number,
+                "found": found
+            }
+        )
+    finally:
+        db.close()
 
-# Админка: теперь дашборд будет доступен по адресу /admin
+# Маршрут для получения количества билетов (используется в AJAX запросе)
+@app.get("/tickets/count")
+async def get_tickets_count():
+    db: Session = next(get_db())
+    try:
+        count = db.query(Ticket).count()
+        return {"count": count}
+    finally:
+        db.close()
+
+# Админка
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
-    """
-    Обрабатывает запросы к URL дашборда (например, http://www.metabase.info/admin).
-    Возвращает HTML-файл админ-панели управления билетами (admin_dashboard.html).
-    """
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
-
