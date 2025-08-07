@@ -15,37 +15,47 @@ def get_country_name(code: str):
     """
     return country_name_map.get(code.upper(), code)
 
+# Объявляем, где находятся ваши HTML-файлы
+# Убедитесь, что папка 'templates' существует и содержит ваши HTML-файлы.
 templates = Jinja2Templates(directory="templates")
+
+# Применяем фильтр к шаблонам Jinja2
 templates.env.filters["country_name"] = get_country_name
 
 app = FastAPI()
 
+# Создание таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
+# Подключение роутеров
 app.include_router(ticket.router)
 
+# Подключение статических файлов (CSS, JS, изображения)
+# Файлы из папки `static` будут доступны по URL /static/...
 app.mount("/static", StaticFiles(directory="static"), name="static")
+# Файлы из папки `uploaded_tickets` будут доступны по URL /uploaded_tickets/...
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
 
+
+# ---- ИЗМЕНЁННЫЙ КОД: ГЛАВНАЯ СТРАНИЦА ПОКАЗЫВАЕТ ВАШ ОСНОВНОЙ САЙТ (all_tickets.html) ----
+
+# Корень: отображает ваш основной HTML-файл (all_tickets.html)
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """
-    Корневой маршрут: отображает список всех билетов.
+    Обрабатывает запросы к корневому URL (например, http://www.metabase.info/).
+    Возвращает ваш основной HTML-файл сайта (all_tickets.html).
     """
     return templates.TemplateResponse("all_tickets.html", {"request": request})
 
+# -------------------------------------------------------------------------------------
+
+# Админка: теперь дашборд будет доступен по адресу /admin
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     """
-    Маршрут для дашборда.
+    Обрабатывает запросы к URL дашборда (например, http://www.metabase.info/admin).
+    Возвращает HTML-файл админ-панели управления билетами (admin_dashboard.html).
     """
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
 
-# ---- НОВЫЙ КОД: МАРШРУТ ДЛЯ СОЗДАНИЯ БИЛЕТА ----
-@app.get("/create_ticket", response_class=HTMLResponse)
-async def create_ticket_page(request: Request):
-    """
-    Маршрут для страницы создания нового билета.
-    """
-    return templates.TemplateResponse("create_ticket.html", {"request": request})
-# ---------------------------------------------------
