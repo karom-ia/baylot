@@ -1,493 +1,493 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Metabase: Ticket Storage</title>
-  <style>
-    body {
-      padding: 20px;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f8;
-    }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metabase: Ticket Storage</title>
+  <style>
+    body {
+      padding: 20px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f8;
+    }
 
-    /* ===== HEADER ===== */
-    .custom-header {
-      max-width: 1260px;
-      margin: 0 auto;
-      border-radius: 10px;
-      background: white;
-      border-bottom: 1px solid #eee;
-      padding: 15px 20px;
-    }
+    /* ===== HEADER ===== */
+    .custom-header {
+      max-width: 1260px;
+      margin: 0 auto;
+      border-radius: 10px;
+      background: white;
+      border-bottom: 1px solid #eee;
+      padding: 15px 20px;
+    }
 
-    .header-container {
-      max-width: 1290px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    .header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    .header-container {
+      max-width: 1290px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-    .header-left img {
-      height: 40px;
-    }
+    .header-left img {
+      height: 40px;
+    }
 
-    .header-title {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
 
-    .header-title strong {
-      font-size: 18px;
-      color: black;
-    }
+    .header-title strong {
+      font-size: 18px;
+      color: black;
+    }
 
-    .header-title small {
-      font-size: 12px;
-      color: gray;
-    }
+    .header-title small {
+      font-size: 12px;
+      color: gray;
+    }
 
-    .header-tag {
-      background: #ff3cac;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 20px;
-      margin-left: 10px;
-      font-weight: bold;
-      font-size: 14px;
-    }
+    .header-tag {
+      background: #ff3cac;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-    .header-search {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      max-width: 600px;
-      width: 100%;
-      justify-content: center;
-    }
+    .header-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 600px;
+      width: 100%;
+      justify-content: center;
+    }
 
-    .header-search input[type="text"] {
-  padding: 10px 15px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  flex: 1;
-  min-width: 180px;
-  outline: none; /* Убираем чёрную рамку */
-  transition: all 0.2s ease;
+    .header-search input[type="text"] {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  flex: 1;
+  min-width: 180px;
+  outline: none; /* Убираем чёрную рамку */
+  transition: all 0.2s ease;
 }
 
 /* Когда фокус (нажатие) на input — задаём свой цвет */
 .header-search input[type="text"]:focus {
-  border-color: #0BB3D9;       /* Зелёная рамка */
-  box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2); /* Тень вокруг */
-  background-color: white;     /* Белый фон, если нужно */
-  color: black;                /* Цвет текста */
+  border-color: #0BB3D9;       /* Зелёная рамка */
+  box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2); /* Тень вокруг */
+  background-color: white;     /* Белый фон, если нужно */
+  color: black;                /* Цвет текста */
 }
 
 
-    .header-search button {
-      padding: 8px 16px;
-      background: rgb(204,238,255,0.6);
-      color: #0BB3D9;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
+    .header-search button {
+      padding: 8px 16px;
+      background: rgb(204,238,255,0.6);
+      color: #0BB3D9;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
 
-    .header-search button:hover {
-      text-decoration: line-through;
-      background: rgb(204,238,255,0.8);
-    }
+    .header-search button:hover {
+      text-decoration: line-through;
+      background: rgb(204,238,255,0.8);
+    }
 
-    .winner-only-label {
-      display: flex;
-      align-items: center;
-      background: rgb(204,238,255,0.6);
-      color: #0BB3D9;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
+    .winner-only-label {
+      display: flex;
+      align-items: center;
+      background: rgb(204,238,255,0.6);
+      color: #0BB3D9;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
 
-    .winner-only-label:hover {
-      text-decoration: line-through;
-      background: rgb(204,238,255,0.8);
-    }
+    .winner-only-label:hover {
+      text-decoration: line-through;
+      background: rgb(204,238,255,0.8);
+    }
 
-    .winner-only-label input {
-      margin-right: 5px;
-      transform: scale(1.2);
-    }
+    .winner-only-label input {
+      margin-right: 5px;
+      transform: scale(1.2);
+    }
 
-    .wallet-button {
-      background: linear-gradient(135deg, #000000, #333333);
-      background: rgb(000,00,000,0.9);
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-      transition: text-decoration 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
+    .wallet-button {
+      background: linear-gradient(135deg, #000000, #333333);
+      background: rgb(000,00,000,0.9);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+      transition: text-decoration 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
 
-    .wallet-button:hover {
-      background: linear-gradient(135deg, #222222, #333333);
-      text-decoration: line-through;
-    }
+    .wallet-button:hover {
+      background: linear-gradient(135deg, #222222, #333333);
+      text-decoration: line-through;
+    }
 
-    @media (max-width: 480px) {
-  .header-search input[type="text"] {
-    font-size: 14px;
-    padding: 8px;
-  }
+    @media (max-width: 480px) {
+  .header-search input[type="text"] {
+    font-size: 14px;
+    padding: 8px;
+  }
 
-  .ticket-number, .ticket-owner, .ticket-status {
-    font-size: 14px;
-  }
+  .ticket-number, .ticket-owner, .ticket-status {
+    font-size: 14px;
+  }
 
-  .ticket-info {
-    padding: 10px;
-  }
+  .ticket-info {
+    padding: 10px;
+  }
 
-  .ticket {
-    margin-bottom: 20px;
-  }
+  .ticket {
+    margin-bottom: 20px;
+  }
 }
 
 
-    /* ===== OTHER STYLES ===== */
-    .notification {
-      text-align: center;
-      padding: 12px 20px;
-      border-radius: 8px;
-      margin: 10px auto;
-      max-width: 400px;
-      font-size: 16px;
-    }
+    /* ===== OTHER STYLES ===== */
+    .notification {
+      text-align: center;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 10px auto;
+      max-width: 400px;
+      font-size: 16px;
+    }
 
-    .success { background: #27ae60; color: white; }
-    .error { background: #e74c3c; color: white; }
+    .success { background: #27ae60; color: white; }
+    .error { background: #e74c3c; color: white; }
 
-    .ticket-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  max-width: 1300px;
-  margin: auto;
+    .ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  max-width: 1300px;
+  margin: auto;
 }
 
 .ticket {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  max-width: 300px; /* ← ДОБАВЬ ЭТО */
-  width: 100%;       /* ← И ЭТО */
-  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  max-width: 300px; /* ← ДОБАВЬ ЭТО */
+  width: 100%;       /* ← И ЭТО */
+  margin: 0 auto;
 }
 
 
-    .ticket img {
-  width: 100%;
-  height: auto;
-  max-height: 250px;
-  object-fit: cover;
-  display: block;
+    .ticket img {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: cover;
+  display: block;
 }
 
-    .ticket-info {
-      padding: 15px;
-    }
+    .ticket-info {
+      padding: 15px;
+    }
 
-    .ticket-number { font-size: 18px; font-weight: bold; }
-    .ticket-owner, .ticket-winner, .ticket-prize, .ticket-status {
-      margin-top: 8px;
-      font-size: 15px;
-      color: #555;
-    }
+    .ticket-number { font-size: 18px; font-weight: bold; }
+    .ticket-owner, .ticket-winner, .ticket-prize, .ticket-status {
+      margin-top: 8px;
+      font-size: 15px;
+      color: #555;
+    }
 
-    .winner {
-      color: #FD0082;
-      background: rgb(253,0,130, 0.1);
-      padding: 5px 10px;
-      border-radius: 6px;
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
+    .winner {
+      color: #FD0082;
+      background: rgb(253,0,130, 0.1);
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
 
-    .happy-star {
-      background: #d1e7ff;
-      color: #004085;
-      border-radius: 6px;
-      padding: 5px 10px;
-      margin-top: 10px;
-      display: inline-block;
-      font-weight: bold;
-      display: block;
-      text-align: center;
-    }
+    .happy-star {
+      background: #d1e7ff;
+      color: #004085;
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin-top: 10px;
+      display: inline-block;
+      font-weight: bold;
+      display: block;
+      text-align: center;
+    }
 
-    .ticket-prize {
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      border-radius: 6px;
-      padding: 5px 10px;
-      margin-top: 10px;
-      color: #856404;
-      display: block;
-      text-align: center;
-    }
+    .ticket-prize {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin-top: 10px;
+      color: #856404;
+      display: block;
+      text-align: center;
+    }
 
-    .ticket-status {
-      margin-top: 12px;
-      font-weight: bold;
-    }
+    .ticket-status {
+      margin-top: 12px;
+      font-weight: bold;
+    }
 
-    .claim-form {
-      margin-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .claim-form {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-    .claim-form input {
-      padding: 8px;
-      font-size: 14px;
-      width: 100%;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-    .claim-form input:focus {
-  border-color: #0BB3D9;              /* красивый голубой */
-  box-shadow: 0 0 6px rgba(11, 179, 217, 0.5);
-  background-color: ;
-  outline: none; /* Убираем системную рамку */
-  transition: all 0.1s ease;
+    .claim-form input {
+      padding: 8px;
+      font-size: 14px;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .claim-form input:focus {
+  border-color: #0BB3D9;              /* красивый голубой */
+  box-shadow: 0 0 6px rgba(11, 179, 217, 0.5);
+  background-color: ;
+  outline: none; /* Убираем системную рамку */
+  transition: all 0.1s ease;
 }
 
 
-    .claim-form button {
-      background-color: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px;
-      cursor: pointer;
-    }
-    .claim-form button:hover {
-      text-decoration: line-through;
-      background-color: rgba(253, 0, 130, 0.5); /* 50% розовый */
-    }
+    .claim-form button {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .claim-form button:hover {
+      text-decoration: line-through;
+      background-color: rgba(253, 0, 130, 0.5); /* 50% розовый */
+    }
 
-    .contact-options {
-      display: none;
-      margin-top: 10px;
-    }
+    .contact-options {
+      display: none;
+      margin-top: 10px;
+    }
 
-    .contact-options a {
-      display: inline-block;
-      margin: 5px;
-      padding: 8px 12px;
-      background: #3498db;
-      color: white;
-      border-radius: 6px;
-      text-decoration: none;
-    }
+    .contact-options a {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 12px;
+      background: #3498db;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
 
-    .promo-banner {
-  background: black;
-  color: white;
-  padding: 40px 20px;
-  border-radius: 20px;
-  max-width: 1260px;
-  margin: 30px auto;
+    .promo-banner {
+  background: black;
+  color: white;
+  padding: 40px 20px;
+  border-radius: 20px;
+  max-width: 1260px;
+  margin: 30px auto;
 }
 
 .promo-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 30px;
-  flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
 }
 
 .promo-content h2 {
-  color: #ff00cc;
-  margin: 0 0 10px;
-  font-size: 22px;
+  color: #ff00cc;
+  margin: 0 0 10px;
+  font-size: 22px;
 }
 
 .promo-content p {
-  font-size: 15px;
-  line-height: 1.5;
-  color: #ccc;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #ccc;
 }
 
 .promo-content img {
-  max-width: 150px;
-  border-radius: 12px;
+  max-width: 150px;
+  border-radius: 12px;
 }
 .winner-highlight {
-  border: 2px solid gold;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+  border: 2px solid gold;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
 }
 </style>
 
 <style>
 @media (max-width: 480px) {
-  .ticket-grid {
-    padding: 10px;
-    gap: 10px;
-  }
+  .ticket-grid {
+    padding: 10px;
+    gap: 10px;
+  }
 
-  .promo-banner {
-    padding: 20px 25px;
-  }
+  .promo-banner {
+    padding: 20px 25px;
+  }
 
-  .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-  .header-search {
-    flex-direction: column;
-    width: 100%;
-    align-items: stretch;
-  }
+  .header-search {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
 
-  .header-search input,
-  .header-search button {
-    width: 100%;
-  }
+  .header-search input,
+  .header-search button {
+    width: 100%;
+  }
 
-  .header-right {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
+  .header-right {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
 
-  .new-tickets-button,
-  .wallet-button {
-    width: 100%;
-    font-size: 14px;
-    padding: 8px 14px;
-  }
+  .new-tickets-button,
+  .wallet-button {
+    width: 100%;
+    font-size: 14px;
+    padding: 8px 14px;
+  }
 
-  button, a {
-  -webkit-tap-highlight-color: transparent; /* отключает синий фон */
+  button, a {
+  -webkit-tap-highlight-color: transparent; /* отключает синий фон */
 }
 
 button:focus, a:focus {
-  outline: none;
+  outline: none;
 }
 
 
-  .header-tag {
-    font-size: 12px;
-    padding: 4px 10px;
-  }
+  .header-tag {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
 
-  .ticket-number {
-    font-size: 16px;
-  }
+  .ticket-number {
+    font-size: 16px;
+  }
 
-  .claim-form input,
-  .claim-form button {
-    font-size: 14px;
-  }
+  .claim-form input,
+  .claim-form button {
+    font-size: 14px;
+  }
 }
 @media (max-width: 480px) {
-  .header-container {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
 
-  .header-search {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    align-items: stretch;
-  }
+  .header-search {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-items: stretch;
+  }
 
-  .winner-only-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: #3498db;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  white-space: nowrap;
-  font-weight: bold;
+  .winner-only-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #3498db;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  font-weight: bold;
 }
 
 .winner-only-label input[type="checkbox"] {
-  transform: scale(1);
-  margin: 0;
-  padding: 0;
+  transform: scale(1);
+  margin: 0;
+  padding: 0;
 }
 
 
-  .header-right {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    gap: 10px;
-  }
+  .header-right {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 10px;
+  }
 
-  .new-tickets-button,
-  .wallet-button {
-    width: 100%;
-    font-size: 15px;
-    padding: 10px 16px;
-  }
+  .new-tickets-button,
+  .wallet-button {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px 16px;
+  }
 }
 @media (max-width: 480px) {
-  .ticket-grid {
-    justify-content: center;
-    padding: 10px;
-    gap: 15px;
-  }
+  .ticket-grid {
+    justify-content: center;
+    padding: 10px;
+    gap: 15px;
+  }
 
-  .ticket {
-    margin: 0 auto;  /* ← НА ВСЯКИЙ СЛУЧАЙ */
-  }
+  .ticket {
+    margin: 0 auto;  /* ← НА ВСЯКИЙ СЛУЧАЙ */
+  }
 }
 
 
@@ -495,179 +495,179 @@ button:focus, a:focus {
 
 </head>
 
-  </style>
+  </style>
 </head>
 <style>
-  .new-tickets-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 9px 15px;
-  width: 100%;
-  font-size: 14px;
-  color: #FD0082;
-  background: rgb(253,0,130,0.1);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: center;
-  white-space: nowrap;
+  .new-tickets-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 15px;
+  width: 100%;
+  font-size: 14px;
+  color: #FD0082;
+  background: rgb(253,0,130,0.1);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
 }
 .new-tickets-button:hover {
-  text-decoration: line-through;
-  background: rgb(253,0,130,0.2);
-} 
+  text-decoration: line-through;
+  background: rgb(253,0,130,0.2);
+} 
 
 #ticket-count-box {
-  background: white;
-  color: #ff4b2b;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 8px;
+  background: white;
+  color: #ff4b2b;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 8px;
 }
 
-  @media (max-width: 480px) {
-  .header-search input[type="text"] {
-    width: 100%;
-    max-width: 100%;
-    font-size: 14px;
-    padding: 10px;
-    box-sizing: border-box;
-  }
+  @media (max-width: 480px) {
+  .header-search input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    font-size: 14px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
 
-  .winner-only-label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    box-sizing: border-box;
-    white-space: nowrap;
-  }
+  .winner-only-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
 
-  .winner-only-label input[type="checkbox"] {
-    margin: 0;
-    transform: scale(1.2);
-  }
+  .winner-only-label input[type="checkbox"] {
+    margin: 0;
+    transform: scale(1.2);
+  }
 
-  .header-search {
-    width: 100%;
-    gap: 8px;
-  }
+  .header-search {
+    width: 100%;
+    gap: 8px;
+  }
 }
 @media (max-width: 480px) {
-  .winner-only-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 12px;
-    background: #3498db;
-    border-radius: 10px;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    width: 100%;
-    box-sizing: border-box;
-    white-space: nowrap;
-  }
+  .winner-only-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: #3498db;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
 
-  .winner-only-label input[type="checkbox"] {
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid white;
-    border-radius: 4px;
-    position: relative;
-    margin: 0;
-  }
+  .winner-only-label input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid white;
+    border-radius: 4px;
+    position: relative;
+    margin: 0;
+  }
 
-  .winner-only-label input[type="checkbox"]:checked::before {
-    content: "✔";
-    position: absolute;
-    left: 2px;
-    top: -2px;
-    font-size: 14px;
-    color: white;
-  }
+  .winner-only-label input[type="checkbox"]:checked::before {
+    content: "✔";
+    position: absolute;
+    left: 2px;
+    top: -2px;
+    font-size: 14px;
+    color: white;
+  }
 }
 .main-winner-highlight {
-  border: 3px solid #FABA0A;
-  box-shadow: 0 0 18px rgba(250, 186, 10, 0.9);
-  background: linear-gradient(170deg, #FABA0A, #ffe6f7);
+  border: 3px solid #FABA0A;
+  box-shadow: 0 0 18px rgba(250, 186, 10, 0.9);
+  background: linear-gradient(170deg, #FABA0A, #ffe6f7);
 }
 .main-winner-highlight:hover {
-  
-  box-shadow: 0 0 18px rgba(274, 0, 215, 0.5);
-  
+  
+  box-shadow: 0 0 18px rgba(274, 0, 215, 0.5);
+  
 }
 
 </style>
 <style>
 @keyframes shake {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-  100% { transform: translateX(0); }
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
 }
 
 input.shake {
-  animation: shake 0.3s;
-  border: 2px solid #e74c3c !important;
-  background-color: #ffeaea !important;
-  color: #000;
+  animation: shake 0.3s;
+  border: 2px solid #e74c3c !important;
+  background-color: #ffeaea !important;
+  color: #000;
 }
 .interactive-title {
-  text-decoration: none;
-  color: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
 .interactive-title:active strong {
-  text-decoration: line-through;
+  text-decoration: line-through;
 }
 
 .interactive-title:hover {
-  text-decoration: line-through;
+  text-decoration: line-through;
 }
 </style>
 
 <style>
 .wallet-button2 {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 5px 10px;
-  background-color: #444;
-  color: white;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 13px;
-  transition: background 0.3s ease;
+  display: inline-block;
+  margin-left: 6px;
+  padding: 5px 10px;
+  background-color: #444;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.3s ease;
 }
 .wallet-button2:hover {
-  background-color: #666;
+  background-color: #666;
 }
 
 </style>
 
 <style>
 .icon-button {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #000;
-  font-weight: 500;
-  transition: background 0.3s;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+  transition: background 0.3s;
 }
 .icon-button:hover {
-  background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 </style>
 
@@ -676,247 +676,83 @@ input.shake {
 <body>
 
 <header class="custom-header">
-  <div class="header-container">
-    <div class="header-left">
-      <img src="/static/images/baylot-main-logo.png" alt="Logo" style="height: 50px; border-radius: 12px;">
-      <a href="http://www.metabase.info" class="header-title interactive-title">
-  <strong>Metabase</strong>
-  <small>Alltickets</small>
+  <div class="header-container">
+    <div class="header-left">
+      <img src="/static/images/baylot-main-logo.png" alt="Logo" style="height: 50px; border-radius: 12px;">
+      <a href="http://www.metabase.info" class="header-title interactive-title">
+  <strong>Metabase</strong>
+  <small>Alltickets</small>
 </a>
-      <div class="header-tag" id="ticket-count-display">{{ tickets|length }} tickets</div>
-    </div>
+      <div class="header-tag" id="ticket-count-display">0 tickets</div>
+    </div>
 
-    <form method="get" action="/tickets/all/html" class="header-search" id="searchForm">
-  <input type="text" name="number" id="ticketInput" placeholder="Search ticket number...">
-  <label class="winner-only-label">
-    <input type="checkbox" name="winners_only" value="true" {% if winners_only %}checked{% endif %}>
-    🏆 Winners only
-  </label>
-  <button type="submit">🔍 Find</button>
+    <form method="get" action="/tickets/all/html" class="header-search" id="searchForm">
+  <input type="text" name="number" id="ticketInput" placeholder="Search ticket number...">
+  <label class="winner-only-label">
+    <input type="checkbox" name="winners_only" value="true">
+    🏆 Winners only
+  </label>
+  <button type="submit">🔍 Find</button>
 </form>
 
-<div class="header-right"> 
-      <!-- 🔔 КНОПКА С УВЕДОМЛЕНИЕМ -->
+<div class="header-right"> 
+      <!-- � КНОПКА С УВЕДОМЛЕНИЕМ -->
 <button id="newTicketsBtn" class="new-tickets-button" onclick="location.reload()">
-  <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#9B5278"><path d="M480-192q-120 0-205.5-85T192-486l-57 57-51-51 144-144 144 144-51 51-57-57q-2 94 62 158t154 64q22 0 42-4t39-12l53 53q-30 16-63.5 25.5T480-192Zm252-144L588-480l51-51 57 57q2-94-62-158t-154-64q-21 0-41.5 4T399-680l-53-53q30-16 64-25.5t70-9.5q121 0 206 85t82 209l57-57 51 51-144 144Z"/></svg>New Tickets <span id="ticket-count-box">(0)</span>
+  <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#9B5278"><path d="M480-192q-120 0-205.5-85T192-486l-57 57-51-51 144-144 144 144-51 51-57-57q-2 94 62 158t154 64q22 0 42-4t39-12l53 53q-30 16-63.5 25.5T480-192Zm252-144L588-480l51-51 57 57q2-94-62-158t-154-64q-21 0-41.5 4T399-680l-53-53q30-16 64-25.5t70-9.5q121 0 206 85t82 209l57-57 51 51-144 144Z"/></svg>New Tickets <span id="ticket-count-box">(0)</span>
 </button>
-      <button class="wallet-button">Baylot</button>
-    </div>
-  </div>
+      <button class="wallet-button">Baylot</button>
+    </div>
+  </div>
 </header>
 
 <div class="promo-banner">
-  <div class="promo-content">
-    <div>
-      <h2>🎮 Baylot - this is the first real crypto game... (coming on)</h2>
-      <p>Informasion is not available yet</p>
-    </div>
-    <img src="/static/images/BMW M8-Competition-F92 from baylot 1.jpg" alt="Logo" style="height: 80px;">
-  </div>
+  <div class="promo-content">
+    <div>
+      <h2>🎮 Baylot - this is the first real crypto game... (coming on)</h2>
+      <p>Informasion is not available yet</p>
+    </div>
+    <img src="/static/images/BMW M8-Competition-F92 from baylot 1.jpg" alt="Logo" style="height: 80px;">
+  </div>
 </div>
 
-{% if featured_tickets %}
-<div class="ticket-grid">
-  {% for ticket in featured_tickets %}
-  <div class="ticket main-winner-highlight">
-    <img src="{{ ticket.image_url }}" alt="Билет {{ ticket.ticket_number }}">
-    <div class="ticket-info">
-      <div class="ticket-number">🌟 The main winner: {{ ticket.ticket_number }}</div>
-      <div class="ticket-owner">👤 Owner: {{ ticket.holder_info or "не указан" }}</div>
-      
-      <div class="ticket-owner">
-        🔗 Social:
-        {% if ticket.social_link %}
-          <a href="{{ ticket.social_link }}" target="_blank" class="icon-button" title="Open Social">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
-              <path d="M6.94 3h3.44l3.62 5.17L18.98 3H21l-5.6 7.56L21.62 21h-3.44l-3.98-5.69L9.06 21H7.02l5.88-7.94L6.94 3Zm3.04 1.5H8.76l8.4 12h1.22l-8.4-12Z"/>
-            </svg>
-            Page
-          </a>
-        {% else %}
-          не указан
-        {% endif %}
-      </div>
-
-      <div class="ticket-owner">
-        💳 Wallet:
-        {% if ticket.wallet_address %}
-          <a href="https://solscan.io/account/{{ ticket.wallet_address }}" target="_blank" class="icon-button">
-            {{ ticket.wallet_address[:4] }}...{{ ticket.wallet_address[-4:] }}
-          </a>
-        {% else %}
-          не указан
-        {% endif %}
-      </div>
-
-      {% if ticket.country_code %}
-        <p>🌍 Country: {{ ticket.country_code|get_flag }} {{ ticket.country_code|country_name }}</p>
-      {% else %}
-        <p>🌍 Country: Unknown</p>
-      {% endif %}
-
-      {% if ticket.is_winner %}
-      <div class="happy-star">🌟 Happy Start</div>
-      <div class="ticket-winner winner">🏆 Winner</div>
-  
-  {% if ticket.prize_description %}
-    <div class="ticket-prize">🎁 {{ ticket.prize_description }}</div>
-  {% endif %}
-
-  <div class="claim-form">
-    <input type="text" placeholder="Enter the ticket ID" id="input-{{ ticket.id }}">
-    <button type="button" onclick="checkID('{{ ticket.id }}')">Claim Prize</button>
-
-    <div class="claim-instruction" id="instruction-{{ ticket.id }}" style="display:none; margin-top: 10px;">
-      📞 <strong>Contact us to receive the prize:</strong>
+<div class="ticket-grid" id="tickets-container">
+    <div class="notification success" id="initial-message">
+        Загрузка билетов...
     </div>
-
-    <div class="contact-options" id="contacts-{{ ticket.id }}" style="display:none;">
-      <a href="https://t.me/BabaySupport" target="_blank">Telegram</a>
-      <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a>
-      <a href="mailto:support@babay.io">Email</a>
-    </div>
-  </div>
-{% endif %}
-
-
-      
-    </div>
-  </div>
-  {% endfor %}
 </div>
-{% endif %}
-
-
-
-{% if number %}
-  {% if found %}
-    <div class="notification success">✅ A number match was found: "{{ number }}"</div>
-  {% else %}
-    <div class="notification error">❌ Ticket with a number "{{ number }}" not found</div>
-  {% endif %}
-{% endif %}
-
-<div class="ticket-grid">
-  {% for ticket in tickets %}
-  <div class="ticket {% if ticket.is_winner %}winner-highlight{% endif %}">
-    <img src="{{ ticket.image_url }}" alt="Билет {{ ticket.ticket_number }}">
-    <div class="ticket-info">
-      <div class="ticket-number">🎟 Number: {{ ticket.ticket_number }}</div>
-      <div class="ticket-owner">👤 Owner: {{ ticket.holder_info or "не указан" }}</div>
-    
-
-
-<div class="ticket-owner">
-  <span style="margin-right: 5px;">🔗 Social:</span>
-  {% if ticket.social_link %}
-   <a href="{{ ticket.social_link }}" target="_blank" class="icon-button" title="Open Twitter/X">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
-    <path d="M6.94 3h3.44l3.62 5.17L18.98 3H21l-5.6 7.56L21.62 21h-3.44l-3.98-5.69L9.06 21H7.02l5.88-7.94L6.94 3Zm3.04 1.5H8.76l8.4 12h1.22l-8.4-12Z"/>
-  </svg>
-  Page
-</a>
-
-
-
-  {% else %}
-    <span class="text-muted">не указан</span>
-  {% endif %}
-</div>
-
-<div class="ticket-owner">
-  <span style="margin-right: 5px;">💳 Wallet:</span>
-  {% if ticket.wallet_address %}
-    <a href="https://solscan.io/account/{{ ticket.wallet_address }}" target="_blank" class="icon-button">
-      {{ ticket.wallet_address[:4] }}...{{ ticket.wallet_address[-4:] }}
-    </a>
-  {% else %}
-    <span class="text-muted">не указан</span>
-  {% endif %}
-</div>
-{% if ticket.country_code %}
-  <p>🌍 Country: {{ ticket.country_code|get_flag }} {{ ticket.country_code|country_name }}</p>
-{% else %}
-  <p>🌍 Country: Unknown</p>
-{% endif %}
-
-
-
-      <!-- FOR WINNER -->
-      {% if ticket.is_winner %}
-  <div class="happy-star">🌟 Happy Start</div>
-  <div class="ticket-winner winner">🏆 Winner</div>
-  {% if ticket.prize_description %}
-    <div class="ticket-prize">🎁 {{ ticket.prize_description }}</div>
-  {% endif %}
-
-  <div class="claim-form">
-    <input type="text" placeholder="Enter the ticket ID" id="input-{{ ticket.id }}">
-    <button type="button" onclick="checkID('{{ ticket.id }}')">Claim Prize</button>
-
-    <!-- 🆕 Новый текст перед контактами -->
-    <div class="claim-instruction" id="instruction-{{ ticket.id }}" style="display:none; margin-top: 10px;">
-      📞 <strong>Contact us to receive the prize:</strong>
-    </div>
-
-    <!-- Контакты -->
-    <div class="contact-options" id="contacts-{{ ticket.id }}" style="display:none;">
-      <a href="https://t.me/BabaySupport" target="_blank">Telegram</a>
-      <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a>
-      <a href="mailto:support@babay.io">Email</a>
-    </div>
-  </div>
-
-{% endif %}
-
-      <div class="ticket-status">
-        {% if ticket.is_winner %}
-          🔴 Winner ticket
-        {% else %}
-          🟢 Active
-        {% endif %}
-      </div>
-    </div>
-  
-
-  </div>
-  {% endfor %}
-</div>
-
-
 
 <script>
 function checkID(ticketId) {
-  const input = document.getElementById(`input-${ticketId}`);
-  const value = input.value.trim();
-  if (value === ticketId) {
-    document.getElementById(`contacts-${ticketId}`).style.display = 'block';
-    document.getElementById(`instruction-${ticketId}`).style.display = 'block';
-  } else {
-    alert("❌ Invalid ticket ID. Please enter your ticket ID.");
-  }
+  const input = document.getElementById(`input-${ticketId}`);
+  const value = input.value.trim();
+  if (value === ticketId) {
+    document.getElementById(`contacts-${ticketId}`).style.display = 'block';
+    document.getElementById(`instruction-${ticketId}`).style.display = 'block';
+  } else {
+    alert("❌ Invalid ticket ID. Please enter your ticket ID.");
+  }
 }
 
 
 // Валидация формы поиска
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("searchForm").addEventListener("submit", function(e) {
-    const input = document.getElementById("ticketInput");
-    const winnersOnly = this.querySelector('input[name="winners_only"]');
+  document.getElementById("searchForm").addEventListener("submit", function(e) {
+    const input = document.getElementById("ticketInput");
+    const winnersOnly = this.querySelector('input[name="winners_only"]');
 
-    if (!input.value.trim() && !(winnersOnly && winnersOnly.checked)) {
-      e.preventDefault();
+    if (!input.value.trim() && !(winnersOnly && winnersOnly.checked)) {
+      e.preventDefault();
 
-      const originalPlaceholder = input.placeholder;
-      input.classList.add("shake");
-      input.placeholder = "Enter the ticket number...";
+      const originalPlaceholder = input.placeholder;
+      input.classList.add("shake");
+      input.placeholder = "Enter the ticket number...";
 
-      setTimeout(() => {
-        input.classList.remove("shake");
-        input.placeholder = originalPlaceholder;
-      }, 2000);
-    }
-  });
+      setTimeout(() => {
+        input.classList.remove("shake");
+        input.placeholder = originalPlaceholder;
+      }, 2000);
+    }
+  });
 });
 </script>
 
@@ -926,71 +762,204 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <script>
-let lastTicketCount = {{ tickets|length }};
+// --- НОВЫЙ БЛОК КОДА ДЛЯ ДИНАМИЧЕСКОГО ОТОБРАЖЕНИЯ БИЛЕТОВ ---
+
+const ticketsContainer = document.getElementById('tickets-container');
+const ticketCountDisplay = document.getElementById('ticket-count-display');
+const newTicketsBtn = document.getElementById('newTicketsBtn');
+const newTicketCountBox = document.getElementById('ticket-count-box');
+const initialMessage = document.getElementById('initial-message');
+
+// Функция для создания HTML-карточки билета
+function createTicketCard(ticket) {
+    const card = document.createElement('div');
+    card.className = `ticket ${ticket.is_winner ? 'winner-highlight' : ''}`;
+
+    const socialLinkHtml = ticket.social_link
+        ? `<a href="${ticket.social_link}" target="_blank" class="icon-button" title="Open Social">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                <path d="M6.94 3h3.44l3.62 5.17L18.98 3H21l-5.6 7.56L21.62 21h-3.44l-3.98-5.69L9.06 21H7.02l5.88-7.94L6.94 3Zm3.04 1.5H8.76l8.4 12h1.22l-8.4-12Z"/>
+            </svg>
+            Page
+          </a>`
+        : 'не указан';
+    
+    const walletAddressHtml = ticket.wallet_address
+        ? `<a href="https://solscan.io/account/${ticket.wallet_address}" target="_blank" class="icon-button">
+            ${ticket.wallet_address.slice(0, 4)}...${ticket.wallet_address.slice(-4)}
+          </a>`
+        : 'не указан';
+
+    const winnerInfoHtml = ticket.is_winner
+        ? `
+        <div class="happy-star">🌟 Happy Start</div>
+        <div class="ticket-winner winner">🏆 Winner</div>
+        ${ticket.prize_description ? `<div class="ticket-prize">🎁 ${ticket.prize_description}</div>` : ''}
+        <div class="claim-form">
+          <input type="text" placeholder="Enter the ticket ID" id="input-${ticket.id}">
+          <button type="button" onclick="checkID('${ticket.id}')">Claim Prize</button>
+          <div class="claim-instruction" id="instruction-${ticket.id}" style="display:none; margin-top: 10px;">
+            📞 <strong>Contact us to receive the prize:</strong>
+          </div>
+          <div class="contact-options" id="contacts-${ticket.id}" style="display:none;">
+            <a href="https://t.me/BabaySupport" target="_blank">Telegram</a>
+            <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a>
+            <a href="mailto:support@babay.io">Email</a>
+          </div>
+        </div>
+        `
+        : '';
+        
+    const getCountryFlag = (countryCode) => {
+        const flagMap = {
+            'RU': '🇷🇺', 'US': '🇺🇸', 'GB': '🇬🇧', /* Добавьте другие коды стран */
+            'UA': '🇺🇦', 'KZ': '🇰🇿', 'BY': '🇧🇾', 'UZ': '🇺🇿', 'KG': '🇰🇬', 'TM': '🇹🇲', 'TJ': '🇹🇯'
+        };
+        return flagMap[countryCode.toUpperCase()] || '';
+    };
+
+    const countryInfoHtml = ticket.country_code 
+        ? `<p>🌍 Country: ${getCountryFlag(ticket.country_code)} ${ticket.country_code}</p>` 
+        : '<p>🌍 Country: Unknown</p>';
+
+    card.innerHTML = `
+        <img src="${ticket.image_url || '/static/images/placeholder.jpg'}" alt="Билет ${ticket.ticket_number}">
+        <div class="ticket-info">
+            <div class="ticket-number">🎟 Number: ${ticket.ticket_number}</div>
+            <div class="ticket-owner">👤 Owner: ${ticket.holder_info || 'не указан'}</div>
+            <div class="ticket-owner">
+                <span style="margin-right: 5px;">🔗 Social:</span>
+                ${socialLinkHtml}
+            </div>
+            <div class="ticket-owner">
+                <span style="margin-right: 5px;">💳 Wallet:</span>
+                ${walletAddressHtml}
+            </div>
+            ${countryInfoHtml}
+            ${winnerInfoHtml}
+            <div class="ticket-status">
+                ${ticket.is_winner ? '🔴 Winner ticket' : '🟢 Active'}
+            </div>
+        </div>
+    `;
+    return card;
+}
+
+// Асинхронная функция для получения и отображения билетов
+async function fetchAndRenderTickets() {
+    try {
+        if (initialMessage) {
+            initialMessage.style.display = 'block';
+            initialMessage.textContent = 'Загрузка билетов...';
+        }
+        
+        const response = await fetch('/api/tickets');
+        if (!response.ok) {
+            throw new Error('Failed to fetch tickets');
+        }
+        const tickets = await response.json();
+        
+        if (initialMessage) {
+            initialMessage.style.display = 'none';
+        }
+        
+        // Обновляем счетчик билетов в шапке
+        ticketCountDisplay.textContent = `${tickets.length} tickets`;
+        
+        // Очищаем контейнер перед добавлением новых билетов
+        ticketsContainer.innerHTML = '';
+
+        if (tickets.length > 0) {
+            tickets.forEach(ticket => {
+                const card = createTicketCard(ticket);
+                ticketsContainer.appendChild(card);
+            });
+        } else {
+            ticketsContainer.innerHTML = '<div class="notification success" style="margin: 20px;">На данный момент нет доступных билетов.</div>';
+        }
+    } catch (error) {
+        console.error('Error fetching tickets:', error);
+        if (initialMessage) {
+            initialMessage.textContent = '❌ Ошибка загрузки билетов. Пожалуйста, попробуйте позже.';
+            initialMessage.style.display = 'block';
+        } else {
+            ticketsContainer.innerHTML = '<div class="notification error" style="margin: 20px;">❌ Ошибка загрузки билетов. Пожалуйста, попробуйте позже.</div>';
+        }
+        ticketCountDisplay.textContent = '0 tickets';
+    }
+}
+
+// Запускаем функцию получения билетов при загрузке страницы
+window.addEventListener('load', fetchAndRenderTickets);
+
+// Обновление счетчика новых билетов (ваш оригинальный код)
+let lastTicketCount = 0;
 let pendingNewTickets = 0;
 let soundPlayedFor = lastTicketCount;
 let userInteracted = false;
 
-const winnersOnly = {{ 'true' if winners_only else 'false' }};
-const isSearch = "{{ number | default('') | trim }}" !== "";
+const winnersOnly = false; // Упрощено, так как логика фильтрации теперь должна быть на стороне клиента
+const isSearch = false; // Упрощено
 
 setInterval(() => {
-  fetch('/tickets/count')
-    .then(res => res.json())
-    .then(data => {
-      const currentCount = data.count;
-      const showUpdates = !winnersOnly && !isSearch;
+  fetch('/api/tickets/count')
+    .then(res => res.json())
+    .then(data => {
+      const currentCount = data.count;
+      const showUpdates = !winnersOnly && !isSearch;
 
-      if (currentCount > lastTicketCount && showUpdates) {
-        const newTickets = currentCount - lastTicketCount;
-        pendingNewTickets = newTickets;
+      if (currentCount > lastTicketCount && showUpdates) {
+        const newTickets = currentCount - lastTicketCount;
+        pendingNewTickets = newTickets;
 
-        document.getElementById('ticket-count-box').innerText = `(${pendingNewTickets})`;
-        document.getElementById('newTicketsBtn').style.display = 'block';
+        newTicketCountBox.innerText = `(${pendingNewTickets})`;
+        newTicketsBtn.style.display = 'block';
 
-        if (soundPlayedFor !== currentCount && userInteracted) {
-          const sound = document.getElementById('notify-sound');
-          if (sound) {
-            sound.pause();
-            sound.currentTime = 0;
-            sound.play().catch(() => {});
-          }
-          soundPlayedFor = currentCount;
-        }
-      }
-    });
+        if (soundPlayedFor !== currentCount && userInteracted) {
+          const sound = document.getElementById('notify-sound');
+          if (sound) {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.play().catch(() => {});
+          }
+          soundPlayedFor = currentCount;
+        }
+      }
+    });
 }, 10000);
 
-document.getElementById('newTicketsBtn').addEventListener('click', () => {
-  lastTicketCount += pendingNewTickets;
-  pendingNewTickets = 0;
-  document.getElementById('ticket-count-box').innerText = `(0)`;
+newTicketsBtn.addEventListener('click', () => {
+  lastTicketCount += pendingNewTickets;
+  pendingNewTickets = 0;
+  newTicketCountBox.innerText = `(0)`;
+  fetchAndRenderTickets(); // <-- Добавлен вызов функции для обновления билетов
 });
 </script>
 
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const enableSound = () => {
-    const audio = document.getElementById('notify-sound');
-    if (audio) {
-      audio.play().catch(() => {});
-      audio.pause();
-      audio.currentTime = 0;
-    }
-    userInteracted = true;
+  const enableSound = () => {
+    const audio = document.getElementById('notify-sound');
+    if (audio) {
+      audio.play().catch(() => {});
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    userInteracted = true;
 
-    document.removeEventListener('click', enableSound);
-    document.removeEventListener('scroll', enableSound);
-    document.removeEventListener('keydown', enableSound);
-  };
+    document.removeEventListener('click', enableSound);
+    document.removeEventListener('scroll', enableSound);
+    document.removeEventListener('keydown', enableSound);
+  };
 
-  document.addEventListener('click', enableSound);
-  document.addEventListener('scroll', enableSound);
-  document.addEventListener('keydown', enableSound);
+  document.addEventListener('click', enableSound);
+  document.addEventListener('scroll', enableSound);
+  document.addEventListener('keydown', enableSound);
 });
 </script>
 
 
 </body>
 </html>
+�
