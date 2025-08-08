@@ -15,6 +15,17 @@ import traceback
 from typing import Optional
 from pathlib import Path
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+@app.on_event("startup")
+async def startup_log():
+    logger.info("=== СЕРВЕР ЗАПУЩЕН ===")
+    logger.info("Доступные маршруты:")
+    for route in app.routes:
+        logger.info(f"- {route.path}")
+
 @app.get("/test")
 def test():
     return {"status": "OK"}
