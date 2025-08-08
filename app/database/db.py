@@ -1,22 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from typing import Generator
+from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
 
-# Временное решение - используем прямое подключение к SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite:///./tickets.db"
+# Загружаем переменные из .env
+load_dotenv()
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+# Получаем URL базы данных из переменной окружения
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Подключение к базе
+engine = create_engine(DATABASE_URL)
+
+# Создание сессии
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Базовый класс для моделей
 Base = declarative_base()
-
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
