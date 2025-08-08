@@ -1,6 +1,6 @@
 # app/main.py
 
-from fastapi import FastAPI, Request, Form, UploadFile, File, Depends, HTTPException
+from fastapi import FastAPI, Request, Form, UploadFile, File, Depends, HTTPException, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -74,7 +74,7 @@ async def admin_dashboard(request: Request):
 async def create_ticket_form(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
 
-# Новый маршрут для обработки формы
+# Маршрут для обработки формы (HTTP POST)
 @app.post("/admin/create-ticket")
 async def create_ticket_from_form(
     request: Request,
@@ -89,7 +89,6 @@ async def create_ticket_from_form(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    # Проверка ключа администратора
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=403, detail="Forbidden: Invalid admin key")
 
@@ -127,10 +126,11 @@ async def create_ticket_from_form(
         raise HTTPException(status_code=500, detail=str(e))
 
 # Маршрут для API (для создания билетов через JSON)
-@app.post("/admin/create-ticket-api/{admin_key}", response_model=TicketSchema)
+# Обратите внимание: admin_key теперь передается в теле запроса, а не в URL
+@app.post("/admin/create-ticket-api", response_model=TicketSchema)
 async def create_ticket_api(
-    admin_key: str,
-    ticket_data: TicketCreateAPI,
+    admin_key: str = Body(..., embed=True),
+    ticket_data: TicketCreateAPI = Body(..., embed=True),
     db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
@@ -140,7 +140,6 @@ async def create_ticket_api(
         if db.query(Ticket).filter(Ticket.ticket_number == ticket_data.ticket_number).first():
             raise HTTPException(status_code=400, detail="Билет с таким номером уже существует")
         
-        # Создаем экземпляр модели SQLAlchemy из Pydantic-модели
         new_ticket = Ticket(**ticket_data.model_dump())
 
         db.add(new_ticket)
