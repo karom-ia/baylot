@@ -11,15 +11,13 @@ from pathlib import Path
 import os
 from typing import Optional
 import traceback
+from pydantic import BaseModel, HttpUrl
 
 # **Важно:** Замените этот ключ на свой собственный, надежный пароль
 ADMIN_KEY = "MySuperSecretKeyForDelete2233"
 
 def get_country_name(code: str):
-    """Возвращает полное название страны по её коду.
-    Предполагается, что app/utils/country_names.py существует."""
-    # Если файл не существует, можно использовать просто код страны
-    # в качестве имени.
+    """Возвращает полное название страны по её коду."""
     try:
         from app.utils.country_names import country_name_map
         return country_name_map.get(code.upper(), code)
@@ -53,7 +51,6 @@ app.mount("/uploaded_tickets", StaticFiles(directory=upload_dir), name="uploaded
 async def read_root(request: Request, db: Session = Depends(get_db)):
     try:
         tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
-        # Выбираем только билеты-победители для "featured"
         featured_tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.id.desc()).all()
         
         return templates.TemplateResponse(
@@ -79,12 +76,11 @@ async def admin_dashboard(request: Request):
 async def create_ticket_form(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
 
-# Маршрут для создания билета - обработка формы с файлом
-# **Важно:** добавлен параметр admin_key для проверки доступа
-@app.post("/admin/create-ticket/{admin_key}")
-async def create_ticket(
+# Новый маршрут для обработки формы
+@app.post("/admin/create-ticket")
+async def create_ticket_from_form(
     request: Request,
-    admin_key: str,
+    admin_key: str = Form(...),
     ticket_number: str = Form(...),
     holder_info: Optional[str] = Form(None),
     social_link: Optional[str] = Form(None),
@@ -100,11 +96,9 @@ async def create_ticket(
         raise HTTPException(status_code=403, detail="Forbidden: Invalid admin key")
 
     try:
-        # Проверка на дубликат номера билета
         if db.query(Ticket).filter(Ticket.ticket_number == ticket_number).first():
             raise HTTPException(status_code=400, detail="Билет с таким номером уже существует")
 
-        # Сохранение файла
         file_ext = Path(file.filename).suffix
         new_filename = f"{ticket_number}{file_ext}"
         file_path = upload_dir / new_filename
@@ -112,7 +106,6 @@ async def create_ticket(
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
 
-        # Создание объекта Ticket
         ticket = Ticket(
             ticket_number=ticket_number,
             holder_info=holder_info,
@@ -124,12 +117,10 @@ async def create_ticket(
             image_url=f"/uploaded_tickets/{new_filename}"
         )
         
-        # Добавление в базу данных
         db.add(ticket)
         db.commit()
-        db.refresh(ticket) # Обновляем объект, чтобы получить ID
+        db.refresh(ticket)
 
-        # Перенаправление на страницу администратора после успешного создания
         return RedirectResponse(url="/admin", status_code=303)
         
     except Exception as e:
@@ -137,7 +128,52 @@ async def create_ticket(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-# Просмотр отдельного билета
+# Pydantic модель для API
+class TicketCreateAPI(BaseModel):
+    ticket_number: str
+    holder_info: Optional[str] = None
+    social_link: Optional[str] = None
+    wallet_address: Optional[str] = None
+    country_code: Optional[str] = None
+    is_winner: bool = False
+    prize_description: Optional[str] = None
+    image_url: HttpUrl
+
+# Маршрут для API (если нужно создавать билеты не из формы, а через JSON)
+@app.post("/admin/create-ticket/{admin_key}")
+async def create_ticket_api(
+    admin_key: str,
+    ticket: TicketCreateAPI,
+    db: Session = Depends(get_db)
+):
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden: Invalid admin key")
+
+    try:
+        if db.query(Ticket).filter(Ticket.ticket_number == ticket.ticket_number).first():
+            raise HTTPException(status_code=400, detail="Билет с таким номером уже существует")
+        
+        new_ticket = Ticket(
+            ticket_number=ticket.ticket_number,
+            holder_info=ticket.holder_info,
+            social_link=ticket.social_link,
+            wallet_address=ticket.wallet_address,
+            country_code=ticket.country_code,
+            is_winner=ticket.is_winner,
+            prize_description=ticket.prize_description,
+            image_url=ticket.image_url
+        )
+
+        db.add(new_ticket)
+        db.commit()
+        db.refresh(new_ticket)
+
+        return {"message": "Ticket created successfully", "ticket_id": new_ticket.id}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/ticket/{ticket_id}", response_class=HTMLResponse)
 async def view_ticket(ticket_id: int, request: Request, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
@@ -145,7 +181,6 @@ async def view_ticket(ticket_id: int, request: Request, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Билет не найден")
     return templates.TemplateResponse("ticket_view.html", {"request": request, "ticket": ticket})
 
-# Список победителей
 @app.get("/admin/winners", response_class=HTMLResponse)
 async def admin_winners(request: Request, db: Session = Depends(get_db)):
     tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.id.desc()).all()
@@ -156,7 +191,6 @@ async def admin_winners(request: Request, db: Session = Depends(get_db)):
         "winners_only": True
     })
 
-# Поиск билетов
 @app.get("/admin/search-ticket", response_class=HTMLResponse)
 async def admin_search_ticket(request: Request):
     return templates.TemplateResponse("search_form.html", {"request": request})
