@@ -1,40 +1,33 @@
 # app/main.py
 
-from fastapi import FastAPI, Request, Form, UploadFile, File, Depends, HTTPException, Body
+from fastapi import FastAPI, Request, Form, UploadFile, File, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from app.database.db import Base, engine, get_db
 from app.models.ticket import Ticket
-from app.schemas.ticket import TicketCreateAPI, Ticket as TicketSchema
 from pathlib import Path
 import os
 from typing import Optional
 import traceback
 
-# **Важно:** Замените этот ключ на свой собственный, надежный пароль
-ADMIN_KEY = "MySuperSecretKeyForDelete2233"
-
 def get_country_name(code: str):
     """Возвращает полное название страны по её коду."""
-    try:
-        from app.utils.country_names import country_name_map
-        return country_name_map.get(code.upper(), code)
-    except ImportError:
-        return code
+    from app.utils.country_names import country_name_map
+    return country_name_map.get(code.upper(), code)
 
 # Инициализация приложения
 app = FastAPI()
 
-# Настройка шаблонов Jinja2
+# Настройка шаблонов
 templates = Jinja2Templates(directory="templates")
 templates.env.filters["country_name"] = get_country_name
 
 # Создание таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
-# Настройка папок для статических файлов и загрузок
+# Подключение статических файлов
 static_dir = Path("static")
 upload_dir = Path("uploaded_tickets")
 
@@ -44,7 +37,7 @@ upload_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.mount("/uploaded_tickets", StaticFiles(directory=upload_dir), name="uploaded_tickets")
 
-# Главная страница - показывает все билеты
+# Главная страница
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db: Session = Depends(get_db)):
     try:
@@ -62,23 +55,22 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         )
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Админ-панель
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
 
-# Страница с формой для создания билета
+# Создание билета - форма
 @app.get("/admin/create-ticket", response_class=HTMLResponse)
 async def create_ticket_form(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
 
-# Маршрут для обработки формы (HTTP POST)
+# Создание билета - обработка
 @app.post("/admin/create-ticket")
-async def create_ticket_from_form(
+async def create_ticket(
     request: Request,
-    admin_key: str = Form(...),
     ticket_number: str = Form(...),
     holder_info: Optional[str] = Form(None),
     social_link: Optional[str] = Form(None),
@@ -89,13 +81,12 @@ async def create_ticket_from_form(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    if admin_key != ADMIN_KEY:
-        raise HTTPException(status_code=403, detail="Forbidden: Invalid admin key")
-
     try:
+        # Проверка на дубликат
         if db.query(Ticket).filter(Ticket.ticket_number == ticket_number).first():
             raise HTTPException(status_code=400, detail="Билет с таким номером уже существует")
 
+        # Сохранение файла
         file_ext = Path(file.filename).suffix
         new_filename = f"{ticket_number}{file_ext}"
         file_path = upload_dir / new_filename
@@ -103,6 +94,7 @@ async def create_ticket_from_form(
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
 
+        # Создание билета
         ticket = Ticket(
             ticket_number=ticket_number,
             holder_info=holder_info,
@@ -116,8 +108,7 @@ async def create_ticket_from_form(
         
         db.add(ticket)
         db.commit()
-        db.refresh(ticket)
-
+        
         return RedirectResponse(url="/admin", status_code=303)
         
     except Exception as e:
@@ -125,33 +116,7 @@ async def create_ticket_from_form(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-# Маршрут для API (для создания билетов через JSON)
-# Обратите внимание: admin_key теперь передается в теле запроса, а не в URL
-@app.post("/admin/create-ticket-api", response_model=TicketSchema)
-async def create_ticket_api(
-    admin_key: str = Body(..., embed=True),
-    ticket_data: TicketCreateAPI = Body(..., embed=True),
-    db: Session = Depends(get_db)
-):
-    if admin_key != ADMIN_KEY:
-        raise HTTPException(status_code=403, detail="Forbidden: Invalid admin key")
-
-    try:
-        if db.query(Ticket).filter(Ticket.ticket_number == ticket_data.ticket_number).first():
-            raise HTTPException(status_code=400, detail="Билет с таким номером уже существует")
-        
-        new_ticket = Ticket(**ticket_data.model_dump())
-
-        db.add(new_ticket)
-        db.commit()
-        db.refresh(new_ticket)
-
-        return new_ticket
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-
+# Просмотр билета
 @app.get("/ticket/{ticket_id}", response_class=HTMLResponse)
 async def view_ticket(ticket_id: int, request: Request, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
@@ -159,6 +124,7 @@ async def view_ticket(ticket_id: int, request: Request, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Билет не найден")
     return templates.TemplateResponse("ticket_view.html", {"request": request, "ticket": ticket})
 
+# Список победителей
 @app.get("/admin/winners", response_class=HTMLResponse)
 async def admin_winners(request: Request, db: Session = Depends(get_db)):
     tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.id.desc()).all()
@@ -169,6 +135,7 @@ async def admin_winners(request: Request, db: Session = Depends(get_db)):
         "winners_only": True
     })
 
+# Поиск билетов
 @app.get("/admin/search-ticket", response_class=HTMLResponse)
 async def admin_search_ticket(request: Request):
     return templates.TemplateResponse("search_form.html", {"request": request})

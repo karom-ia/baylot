@@ -1,32 +1,36 @@
 # app/database/db.py
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# URL для вашей базы данных SQLite.
-# Замените на вашу строку подключения к базе данных, если вы используете другую.
-SQLALCHEMY_DATABASE_URL = "sqlite:///./ticket_system.db"
+# URL вашей базы данных.
+# Для простоты я использовал SQLite, которая хранит данные в файле.
+# Вы можете изменить это на 'postgresql://user:password@host/dbname' для PostgreSQL.
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
-# Создание движка SQLAlchemy
-# connect_args={"check_same_thread": False} необходимо для SQLite
+# Создаем движок SQLAlchemy.
+# connect_args нужен только для SQLite.
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
-# Создание класса сессии. Это будет класс для каждой сессии базы данных.
+# Создаем класс SessionLocal, который будет использоваться для сессий.
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Базовый класс для моделей SQLAlchemy.
+# Создаем базовый класс для моделей SQLAlchemy.
 Base = declarative_base()
 
+
+# Эта функция-генератор — и есть та самая get_db, которую вы импортировали.
+# Она открывает сессию, возвращает ее и закрывает после использования.
 def get_db():
-    """
-    Создает сессию базы данных и закрывает ее после использования.
-    Эта функция используется как зависимость в маршрутах FastAPI.
-    """
     db = SessionLocal()
     try:
+        # 'yield' передает управление в функцию, которая вызвала get_db.
+        # Например, в ваш API-эндпоинт.
         yield db
     finally:
+        # После завершения запроса (даже если произошла ошибка),
+        # сессия базы данных закрывается.
         db.close()
