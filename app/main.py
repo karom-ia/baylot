@@ -12,36 +12,48 @@ import os
 from typing import Optional
 import traceback
 
+# **Важно:** Замените этот ключ на свой собственный, надежный пароль
+ADMIN_KEY = "MySuperSecretKeyForDelete2233"
+
 def get_country_name(code: str):
-    """Возвращает полное название страны по её коду."""
-    from app.utils.country_names import country_name_map
-    return country_name_map.get(code.upper(), code)
+    """Возвращает полное название страны по её коду.
+    Предполагается, что app/utils/country_names.py существует."""
+    # Если файл не существует, можно использовать просто код страны
+    # в качестве имени.
+    try:
+        from app.utils.country_names import country_name_map
+        return country_name_map.get(code.upper(), code)
+    except ImportError:
+        return code
 
 # Инициализация приложения
 app = FastAPI()
 
-# Настройка шаблонов
+# Настройка шаблонов Jinja2
 templates = Jinja2Templates(directory="templates")
 templates.env.filters["country_name"] = get_country_name
 
 # Создание таблиц в базе данных
 Base.metadata.create_all(bind=engine)
 
-# Подключение статических файлов
+# Настройка папок для статических файлов и загрузок
 static_dir = Path("static")
 upload_dir = Path("uploaded_tickets")
 
+# Создание папок, если их нет
 static_dir.mkdir(exist_ok=True)
 upload_dir.mkdir(exist_ok=True)
 
+# Монтирование статических директорий
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.mount("/uploaded_tickets", StaticFiles(directory=upload_dir), name="uploaded_tickets")
 
-# Главная страница
+# Главная страница - показывает все билеты
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db: Session = Depends(get_db)):
     try:
         tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
+        # Выбираем только билеты-победители для "featured"
         featured_tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.id.desc()).all()
         
         return templates.TemplateResponse(
@@ -55,22 +67,24 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         )
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
 
 # Админ-панель
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
 
-# Создание билета - форма
+# Страница с формой для создания билета
 @app.get("/admin/create-ticket", response_class=HTMLResponse)
 async def create_ticket_form(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
 
-# Создание билета - обработка
-@app.post("/admin/create-ticket")
+# Маршрут для создания билета - обработка формы с файлом
+# **Важно:** добавлен параметр admin_key для проверки доступа
+@app.post("/admin/create-ticket/{admin_key}")
 async def create_ticket(
     request: Request,
+    admin_key: str,
     ticket_number: str = Form(...),
     holder_info: Optional[str] = Form(None),
     social_link: Optional[str] = Form(None),
@@ -81,8 +95,12 @@ async def create_ticket(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+    # Проверка ключа администратора
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden: Invalid admin key")
+
     try:
-        # Проверка на дубликат
+        # Проверка на дубликат номера билета
         if db.query(Ticket).filter(Ticket.ticket_number == ticket_number).first():
             raise HTTPException(status_code=400, detail="Билет с таким номером уже существует")
 
@@ -94,7 +112,7 @@ async def create_ticket(
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
 
-        # Создание билета
+        # Создание объекта Ticket
         ticket = Ticket(
             ticket_number=ticket_number,
             holder_info=holder_info,
@@ -106,9 +124,12 @@ async def create_ticket(
             image_url=f"/uploaded_tickets/{new_filename}"
         )
         
+        # Добавление в базу данных
         db.add(ticket)
         db.commit()
-        
+        db.refresh(ticket) # Обновляем объект, чтобы получить ID
+
+        # Перенаправление на страницу администратора после успешного создания
         return RedirectResponse(url="/admin", status_code=303)
         
     except Exception as e:
@@ -116,7 +137,7 @@ async def create_ticket(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-# Просмотр билета
+# Просмотр отдельного билета
 @app.get("/ticket/{ticket_id}", response_class=HTMLResponse)
 async def view_ticket(ticket_id: int, request: Request, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
