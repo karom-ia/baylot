@@ -59,3 +59,28 @@ async def admin_dashboard(request: Request):
     """
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
 
+# Админ-панель
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
+# Форма создания билета в админке
+@app.get("/admin/create-ticket", response_class=HTMLResponse)
+async def admin_create_ticket(request: Request):
+    return templates.TemplateResponse("create_ticket.html", {"request": request})
+
+# Поиск билетов в админке
+@app.get("/admin/search-ticket", response_class=HTMLResponse)
+async def admin_search_ticket(request: Request):
+    return templates.TemplateResponse("search_form.html", {"request": request})
+
+# Список победителей в админке
+@app.get("/admin/winners", response_class=HTMLResponse)
+async def admin_winners(request: Request, db: Session = Depends(get_db)):
+    tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.id.desc()).all()
+    return templates.TemplateResponse("all_tickets.html", {
+        "request": request,
+        "tickets": tickets,
+        "featured_tickets": [],
+        "winners_only": True
+    })
