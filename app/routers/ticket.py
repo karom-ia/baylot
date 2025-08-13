@@ -12,6 +12,7 @@ from fastapi import Request
 from app.schemas.ticket import TicketSchema
 import shutil
 import os
+from dotenv import load_dotenv
 from uuid import uuid4, UUID
 from werkzeug.utils import secure_filename
 
@@ -19,7 +20,15 @@ from werkzeug.utils import secure_filename
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
-ADMIN_KEY = "MySuperSecretKeyForDeleteAll2133"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ADMIN_KEY = os.getenv("ADMIN_KEY")
+if ADMIN_KEY is None:
+    raise RuntimeError("ADMIN_KEY is not set in environment variables")
+
 UPLOAD_DIR = "uploaded_tickets"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
