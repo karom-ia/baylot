@@ -2,17 +2,26 @@ from fastapi import (
     APIRouter, Depends, HTTPException, UploadFile,
     File, Form, Query, Request, Header
 )
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
+from app.utils.template_engine import templates
 from sqlalchemy.orm import Session
 from app.database.db import SessionLocal
 from app.models.ticket import Ticket
+from fastapi.responses import JSONResponse
+from fastapi import Request
 from app.schemas.ticket import TicketSchema
-from app.utils.template_engine import templates
 import shutil
 import os
 from dotenv import load_dotenv
-from uuid import uuid4
+from uuid import uuid4, UUID
 from werkzeug.utils import secure_filename
+
+
+
+router = APIRouter(prefix="/tickets", tags=["Tickets"])
+
+import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -23,7 +32,6 @@ if ADMIN_KEY is None:
 UPLOAD_DIR = "uploaded_tickets"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 def get_db():
     db = SessionLocal()
@@ -44,6 +52,7 @@ async def create_ticket(
     country_code: str = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
+
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -68,6 +77,7 @@ async def create_ticket(
     db.commit()
     db.refresh(new_ticket)
 
+    # 👉 Определим по заголовку, что ожидается: HTML или JSON
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse("ticket_success.html", {
             "request": request,
@@ -87,6 +97,7 @@ async def create_ticket(
             "prize_description": new_ticket.prize_description,
             "created_at": new_ticket.created_at.isoformat(),
         })
+
 
 
 @router.get("/search")
@@ -124,20 +135,14 @@ def declare_winner(
 
 @router.delete("/{ticket_id}")
 def delete_ticket(
-    ticket_id: str,
+    ticket_id: UUID,
     admin_key: str = Query(...),
     db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    from uuid import UUID
-    try:
-        ticket_uuid = UUID(ticket_id)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid ticket ID format")
-
-    ticket = db.query(Ticket).filter(Ticket.id == ticket_uuid).first()
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
@@ -150,6 +155,7 @@ def delete_ticket(
     return {"detail": f"Ticket {ticket_id} deleted"}
 
 
+# ✅ Новый маршрут для удаления всех билетов
 @router.delete("/all/", response_model=dict)
 def delete_all_tickets(x_admin_key: str = Header(...), db: Session = Depends(get_db)):
     if x_admin_key != ADMIN_KEY:
@@ -281,7 +287,7 @@ def show_all_tickets(
     found = None
 
     if number:
-        query = query.filter(Ticket.ticket_number == number)
+        query = query.filter(Ticket.ticket_number == number)  # ← точное совпадение
         found = query.count() > 0
 
     if winners_only:
@@ -289,6 +295,7 @@ def show_all_tickets(
 
     tickets = query.order_by(Ticket.created_at.desc()).all()
 
+    # 🔥 Добавляем избранные билеты для баннера
     featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True).all()
 
     return templates.TemplateResponse("all_tickets.html", {
@@ -300,10 +307,9 @@ def show_all_tickets(
         "featured_tickets": featured_tickets
     })
 
-
 @router.put("/{ticket_id}/feature")
 def feature_ticket(
-    ticket_id: str,
+    ticket_id: UUID,
     is_featured: bool = Query(...),
     admin_key: str = Query(...),
     db: Session = Depends(get_db)
@@ -311,13 +317,7 @@ def feature_ticket(
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    from uuid import UUID
-    try:
-        ticket_uuid = UUID(ticket_id)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid ticket ID format")
-
-    ticket = db.query(Ticket).filter(Ticket.id == ticket_uuid).first()
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
@@ -326,17 +326,14 @@ def feature_ticket(
     db.refresh(ticket)
     return {"detail": f"Ticket {ticket_id} featured = {is_featured}"}
 
-
 @router.get("/count")
 def get_ticket_count(db: Session = Depends(get_db)):
     count = db.query(Ticket).count()
     return {"count": count}
 
-
 @router.get("/create", response_class=HTMLResponse)
 def create_ticket_form(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
-
 
 @router.get("/last_ticket", response_model=TicketSchema)
 def get_last_ticket(db: Session = Depends(get_db)):
@@ -344,3 +341,4 @@ def get_last_ticket(db: Session = Depends(get_db)):
     if not ticket:
         raise HTTPException(status_code=404, detail="No tickets found")
     return ticket
+
