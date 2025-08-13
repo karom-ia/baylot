@@ -4,58 +4,63 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+
 from app.database.db import Base, engine
 from app.models.ticket import Ticket
 from app.routers import ticket
-from app.utils.country_names import country_name_map
+from app.utils.country_names import country_name_map  # словарь кода -> название
 
-def get_country_name(code: str):
+# ---------- Фильтры для Jinja2 ----------
+
+# Преобразование кода страны в флаг (🇺🇸, 🇷🇺 и т.д.)
+def get_flag(country_code: str) -> str:
+    """
+    Возвращает флаг-эмодзи по коду страны (например, 'US' -> 🇺🇸).
+    """
+    if not country_code or len(country_code) != 2:
+        return "🏳️"  # fallback
+    return chr(127397 + ord(country_code[0].upper())) + chr(127397 + ord(country_code[1].upper()))
+
+# Название страны по коду
+def get_country_name(code: str) -> str:
     """
     Возвращает полное название страны по её коду.
     """
     return country_name_map.get(code.upper(), code)
 
-# Объявляем, где находятся ваши HTML-файлы
-# Убедитесь, что папка 'templates' существует и содержит ваши HTML-файлы.
-templates = Jinja2Templates(directory="templates")
-
-# Применяем фильтр к шаблонам Jinja2
-templates.env.filters["country_name"] = get_country_name
+# ---------- Инициализация FastAPI и Jinja2 ----------
 
 app = FastAPI()
 
-# Создание таблиц в базе данных
+# Указываем папку с шаблонами
+templates = Jinja2Templates(directory="templates")
+
+# Регистрируем пользовательские фильтры
+templates.env.filters["country_name"] = get_country_name
+templates.env.filters["get_flag"] = get_flag  # <-- Этого тебе не хватало
+
+# Создаём таблицы в БД (если ещё не созданы)
 Base.metadata.create_all(bind=engine)
 
-# Подключение роутеров
+# Подключаем маршруты
 app.include_router(ticket.router)
 
-# Подключение статических файлов (CSS, JS, изображения)
-# Файлы из папки `static` будут доступны по URL /static/...
+# Подключение статики
 app.mount("/static", StaticFiles(directory="static"), name="static")
-# Файлы из папки `uploaded_tickets` будут доступны по URL /uploaded_tickets/...
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
 
+# ---------- Главные страницы ----------
 
-# ---- ИЗМЕНЁННЫЙ КОД: ГЛАВНАЯ СТРАНИЦА ПОКАЗЫВАЕТ ВАШ ОСНОВНОЙ САЙТ (all_tickets.html) ----
-
-# Корень: отображает ваш основной HTML-файл (all_tickets.html)
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """
-    Обрабатывает запросы к корневому URL (например, http://www.metabase.info/).
-    Возвращает ваш основной HTML-файл сайта (all_tickets.html).
+    Отображает главную страницу с билетами.
     """
     return templates.TemplateResponse("all_tickets.html", {"request": request})
 
-# -------------------------------------------------------------------------------------
-
-# Админка: теперь дашборд будет доступен по адресу /admin
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     """
-    Обрабатывает запросы к URL дашборда (например, http://www.metabase.info/admin).
-    Возвращает HTML-файл админ-панели управления билетами (admin_dashboard.html).
+    Отображает админ-панель.
     """
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
-
