@@ -1,20 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
 from dotenv import load_dotenv
+import os
 
-# Загружаем переменные из .env
-load_dotenv()
+load_dotenv()  # Загружаем переменные из .env
 
-# Получаем URL базы данных из переменной окружения
 DATABASE_URL = os.getenv("DATABASE_URL")
+print(f"👉 DATABASE_URL = {DATABASE_URL}")  # ← временно для отладки
 
-# Подключение к базе
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+if not DATABASE_URL:
+    raise RuntimeError("❌ DATABASE_URL not set or .env not found")
+
 engine = create_engine(DATABASE_URL)
-
-# Создание сессии
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Базовый класс для моделей
+SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
