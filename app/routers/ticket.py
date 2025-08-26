@@ -3,7 +3,7 @@ from fastapi import (
     File, Form, Query, Request, Header
 )
 from fastapi.responses import HTMLResponse
-from app.utils.template_engine import templates
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from app.database.db import SessionLocal
 from app.models.ticket import Ticket
@@ -19,6 +19,9 @@ from werkzeug.utils import secure_filename
 
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
+
+# Инициализация templates
+templates = Jinja2Templates(directory="templates")
 
 import os
 from dotenv import load_dotenv

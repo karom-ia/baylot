@@ -37,7 +37,7 @@ templates = Jinja2Templates(directory="templates")
 
 # Регистрируем пользовательские фильтры
 templates.env.filters["country_name"] = get_country_name
-templates.env.filters["get_flag"] = get_flag  # <-- Этого тебе не хватало
+templates.env.filters["get_flag"] = get_flag
 
 # Создаём таблицы в БД (если ещё не созданы)
 Base.metadata.create_all(bind=engine)
