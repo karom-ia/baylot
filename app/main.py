@@ -7,6 +7,9 @@ from app.database.db import Base, engine
 from app.models.ticket import Ticket
 from app.routers import ticket
 from app.utils.country_names import country_name_map
+import os
+print("DATABASE_URL:", os.getenv("DATABASE_URL"))
+
 
 def get_country_name(code: str):
     """
