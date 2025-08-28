@@ -13,16 +13,10 @@ import secrets
 import os
 from dotenv import load_dotenv
 
-# ✅ Явно указываем путь к .env (внутри папки app)
+# Загружаем .env файл (файл должен лежать в той же папке, что и main.py)
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
-# --- ЛОГ ---
-print("🔐 Загрузка .env из:", dotenv_path)
-print("🔐 DOCS_USERNAME:", os.getenv("DOCS_USERNAME"))
-print("🔐 DOCS_PASSWORD:", "✔️" if os.getenv("DOCS_PASSWORD") else "❌ Не задано")
-
-# 🔐 Защита DOCS
 DOCS_USERNAME = os.getenv("DOCS_USERNAME")
 DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
 security = HTTPBasic()
@@ -42,27 +36,21 @@ def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
 
-# 🎯 Приложение
 app = FastAPI(
     docs_url=None,
-    redoc_url=None
+    redoc_url=None,
 )
 
-# --- Фильтры шаблона ---
 def get_country_name(code: str):
     return country_name_map.get(code.upper(), code)
-
 templates.env.filters["country_name"] = get_country_name
 
-# --- Инициализация базы ---
 Base.metadata.create_all(bind=engine)
 
-# --- Роутеры и статика ---
 app.include_router(ticket.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
 
-# --- Защищённый доступ к документации ---
 @app.get("/docs", include_in_schema=False)
 def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_swagger_ui_html(openapi_url=app.openapi_url, title="Metabase API Docs")
@@ -71,7 +59,6 @@ def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs))
 def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_redoc_html(openapi_url=app.openapi_url, title="Metabase API Redoc")
 
-# --- Главная страница ---
 @app.get("/")
 async def read_root(request: Request, db: Session = Depends(get_db)):
     tickets = db.query(Ticket).order_by(Ticket.created_at.desc()).all()
@@ -85,7 +72,6 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         "found": None,
     })
 
-# --- Страницы ---
 @app.get("/admin")
 async def admin_dashboard(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
