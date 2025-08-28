@@ -18,15 +18,21 @@ dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 # --- ЛОГ ---
-print("DATABASE_URL:", os.getenv("DATABASE_URL"))
+print("🔐 DOCS_USERNAME:", os.getenv("DOCS_USERNAME"))
+print("🔐 DOCS_PASSWORD:", "✔️" if os.getenv("DOCS_PASSWORD") else "❌ Не задано")
 
 # 🔐 Защита DOCS
 DOCS_USERNAME = os.getenv("DOCS_USERNAME")
 DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
 security = HTTPBasic()
 
-
+# 👉 Если нет логина/пароля — отключаем защиту
 def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
+    if not DOCS_USERNAME or not DOCS_PASSWORD:
+        raise HTTPException(
+            status_code=500,
+            detail="DOCS_USERNAME и DOCS_PASSWORD не заданы в .env"
+        )
     correct_username = secrets.compare_digest(credentials.username, DOCS_USERNAME)
     correct_password = secrets.compare_digest(credentials.password, DOCS_PASSWORD)
     if not (correct_username and correct_password):
@@ -35,7 +41,6 @@ def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
             detail="Неверные учетные данные",
             headers={"WWW-Authenticate": "Basic"},
         )
-
 
 # 🎯 Приложение
 app = FastAPI(
@@ -62,11 +67,9 @@ app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="
 def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_swagger_ui_html(openapi_url=app.openapi_url, title="Metabase API Docs")
 
-
 @app.get("/redoc", include_in_schema=False)
 def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_redoc_html(openapi_url=app.openapi_url, title="Metabase API Redoc")
-
 
 # --- Главная страница ---
 @app.get("/")
@@ -82,18 +85,7 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         "found": None,
     })
 
-
 # --- Страницы ---
 @app.get("/admin")
 async def admin_dashboard(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
-
-
-@app.get("/buy")
-async def buy_ticket(request: Request):
-    return templates.TemplateResponse("buy.html", {"request": request})
-
-
-@app.get("/prizes")
-async def show_prizes(request: Request):
-    return templates.TemplateResponse("prizes.html", {"request": request})
