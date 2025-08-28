@@ -10,19 +10,24 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 import secrets
 import os
+from dotenv import load_dotenv
+
+# 🔐 Загрузка переменных из .env
+load_dotenv()
 
 print("DATABASE_URL:", os.getenv("DATABASE_URL"))
 
-# Фильтр для страны
+# 🌍 Фильтр для страны
 def get_country_name(code: str):
     return country_name_map.get(code.upper(), code)
 
 templates.env.filters["country_name"] = get_country_name
 
-# 🔐 Настройки пароля для /docs
-security = HTTPBasic()
-DOCS_USERNAME = "admin_2102"
-DOCS_PASSWORD = "SecRet0025"
+# 🔐 Настройки для docs-защиты
+security = HTTPBasic()  # <-- ЭТОГО НЕ ХВАТАЛО
+
+DOCS_USERNAME = os.getenv("DOCS_USERNAME", "admin")
+DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "secret123")
 
 def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, DOCS_USERNAME)
@@ -34,23 +39,23 @@ def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
 
-# 🚀 FastAPI-приложение с отключёнными публичными docs
+# 🚀 Инициализация FastAPI без публичных /docs
 app = FastAPI(
     docs_url=None,
     redoc_url=None
 )
 
-# База данных
+# 📦 Инициализация БД
 Base.metadata.create_all(bind=engine)
 
-# Роутер тикетов
+# 📂 Подключение маршрутов
 app.include_router(ticket.router)
 
-# Статические файлы
+# 📁 Статика
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
 
-# 🔐 Защищённый доступ к документации
+# 🔒 Закрытый доступ к документации
 @app.get("/docs", include_in_schema=False)
 def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_swagger_ui_html(openapi_url=app.openapi_url, title="Metabase API Docs")
@@ -59,7 +64,7 @@ def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs))
 def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_redoc_html(openapi_url=app.openapi_url, title="Metabase API Redoc")
 
-# Главная
+# 🏠 Главная страница
 @app.get("/")
 async def read_root(request: Request, db: Session = Depends(get_db)):
     tickets = db.query(Ticket).order_by(Ticket.created_at.desc()).all()
@@ -73,7 +78,7 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         "found": None,
     })
 
-# Страница администратора
+# 🔧 Админка
 @app.get("/admin")
 async def admin_dashboard(request: Request):
     return templates.TemplateResponse("admin_dashboard.html", {"request": request})
