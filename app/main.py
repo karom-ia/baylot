@@ -17,8 +17,8 @@ from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
-DOCS_USERNAME = os.getenv("DOCS_USERNAME")
-DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
+DOCS_USERNAME = os.getenv("admin")
+DOCS_PASSWORD = os.getenv("secre123")
 security = HTTPBasic()
 
 def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
