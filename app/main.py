@@ -40,7 +40,7 @@ app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="
 # Корень: отображает ваш главный HTML-файл (admin_dashboard.html)
 @app.get("/")
 async def read_root(request: Request):
-    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+    return templates.TemplateResponse("all_tickets.html", {"request": request})
 
 # ------------------------------------------------------------------
 
