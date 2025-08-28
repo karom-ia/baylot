@@ -15,15 +15,14 @@ import os
 from uuid import uuid4, UUID
 from werkzeug.utils import secure_filename
 
-# ✅ Подключаем конфигурацию
-from app.core.config import ADMIN_KEY
+
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
-# ❌ Удаляем прямое определение ключа
-
+ADMIN_KEY = "MySuperSecretKeyForDeleteAll2133"
 UPLOAD_DIR = "uploaded_tickets"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 def get_db():
     db = SessionLocal()
