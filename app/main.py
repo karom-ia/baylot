@@ -10,23 +10,13 @@ from app.utils.country_names import country_name_map
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 import secrets
-import os
-from dotenv import load_dotenv
 
-# Загружаем .env файл (файл должен лежать в той же папке, что и main.py)
-dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(dotenv_path)
-
-DOCS_USERNAME = os.getenv("admin")
-DOCS_PASSWORD = os.getenv("secre123")
+# Жёстко прописанные логин и пароль
+DOCS_USERNAME = "admin"
+DOCS_PASSWORD = "secre123"
 security = HTTPBasic()
 
 def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
-    if not DOCS_USERNAME or not DOCS_PASSWORD:
-        raise HTTPException(
-            status_code=500,
-            detail="DOCS_USERNAME и DOCS_PASSWORD не заданы в .env"
-        )
     correct_username = secrets.compare_digest(credentials.username, DOCS_USERNAME)
     correct_password = secrets.compare_digest(credentials.password, DOCS_PASSWORD)
     if not (correct_username and correct_password):
