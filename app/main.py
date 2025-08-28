@@ -13,11 +13,12 @@ import secrets
 import os
 from dotenv import load_dotenv
 
-# 🔐 Явно загружаем .env из текущей папки
+# ✅ Явно указываем путь к .env (внутри папки app)
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 # --- ЛОГ ---
+print("🔐 Загрузка .env из:", dotenv_path)
 print("🔐 DOCS_USERNAME:", os.getenv("DOCS_USERNAME"))
 print("🔐 DOCS_PASSWORD:", "✔️" if os.getenv("DOCS_PASSWORD") else "❌ Не задано")
 
@@ -26,7 +27,6 @@ DOCS_USERNAME = os.getenv("DOCS_USERNAME")
 DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
 security = HTTPBasic()
 
-# 👉 Если нет логина/пароля — отключаем защиту
 def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
     if not DOCS_USERNAME or not DOCS_PASSWORD:
         raise HTTPException(
