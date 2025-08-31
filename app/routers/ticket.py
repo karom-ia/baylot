@@ -274,11 +274,14 @@ def show_all_tickets(
     winners_only: bool = Query(False),
     db: Session = Depends(get_db)
 ):
+    # Получаем общее количество всех билетов. Это нужно для счетчика
+    total_tickets_count = db.query(Ticket).count() # <-- Новая строка
+
     query = db.query(Ticket)
     found = None
 
     if number:
-        query = query.filter(Ticket.ticket_number == number)  # ← точное совпадение
+        query = query.filter(Ticket.ticket_number == number)
         found = query.count() > 0
 
     if winners_only:
@@ -286,7 +289,6 @@ def show_all_tickets(
 
     tickets = query.order_by(Ticket.created_at.desc()).all()
 
-    # 🔥 Добавляем избранные билеты для баннера
     featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True).all()
 
     return templates.TemplateResponse("all_tickets.html", {
@@ -295,7 +297,8 @@ def show_all_tickets(
         "number": number,
         "winners_only": winners_only,
         "found": found,
-        "featured_tickets": featured_tickets
+        "featured_tickets": featured_tickets,
+        "total_tickets_count": total_tickets_count # <-- Передаем в шаблон
     })
 
 @router.put("/{ticket_id}/feature")
