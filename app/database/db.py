@@ -1,54 +1,28 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.pool import NullPool
-from app.config import DATABASE_URL
-import logging
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+import os
+from dotenv import load_dotenv
 
-# Настройка логирования
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Загружаем переменные из .env
+load_dotenv()
 
-# Убедитесь что DATABASE_URL начинается с postgresql+asyncpg://
-if DATABASE_URL:
-    if not DATABASE_URL.startswith('postgresql+asyncpg://'):
-        # Автоматически исправляем URL если нужно
-        DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+asyncpg://')
-    logger.info(f"Database URL: {DATABASE_URL}")
-else:
-    raise ValueError("DATABASE_URL is not set in environment variables")
+# Получаем URL базы данных из переменной окружения
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Создаем асинхронный engine
-engine = create_async_engine(
-    DATABASE_URL,
-    echo=True,
-    poolclass=NullPool,
-    future=True,
-    pool_pre_ping=True,  # ← ДОБАВЬТЕ ЭТУ ОПЦИЮ для проверки соединения
-    pool_recycle=3600,   # ← Пересоздаем соединения каждые 60 минут
-)
+# Подключение к базе
+engine = create_engine(DATABASE_URL)
 
-# Асинхронная сессия
-AsyncSessionLocal = async_sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False,
-    autocommit=False
-)
+# Создание сессии
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Базовый класс для моделей
 Base = declarative_base()
 
-async def get_db():
-    """
-    Асинхронный генератор сессий для Dependency Injection
-    """
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()  # ← Автоматический коммит при успехе
-        except Exception as e:
-            await session.rollback()  # ← Откат при ошибке
-            logger.error(f"Database session error: {e}")
-            raise
-        finally:
-            await session.close()
+# Функция для создания сессии в зависимости от запроса
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

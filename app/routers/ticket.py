@@ -2,25 +2,38 @@ from fastapi import (
     APIRouter, Depends, HTTPException, UploadFile,
     File, Form, Query, Request, Header
 )
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from app.utils.template_engine import templates
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from app.database.db import get_db
+from sqlalchemy.orm import Session
+from app.database.db import SessionLocal
 from app.models.ticket import Ticket
+from fastapi.responses import JSONResponse
+from fastapi import Request
 from app.schemas.ticket import TicketSchema
 import shutil
 import os
 from uuid import uuid4, UUID
 from werkzeug.utils import secure_filename
-import httpx
-from datetime import datetime
-from app.config import ADMIN_KEY, SOLANA_WALLET_ADDRESS
+import httpx # ✅ <-- Добавлено
+from pydantic import BaseModel
+from datetime import datetime  # Добавьте эту строку
+
+# ✅ Замените на ваш реальный адрес кошелька
+SOLANA_WALLET_ADDRESS = "4NuDayX7fiZT4Teo9HGBNqCRKNV6bRsPFAY6JkjYC9rN"
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
+ADMIN_KEY = "MySuperSecretKeyForDeleteAll2133"
 UPLOAD_DIR = "uploaded_tickets"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # ✅ Новый маршрут для проверки транзакции
 @router.get("/check-transaction")
@@ -29,7 +42,7 @@ async def check_transaction(tx_hash: str):
     Проверяет транзакцию в блокчейне Solana на валидность.
     """
     SOLANA_API_URL = "https://api.mainnet-beta.solana.com"
-    required_amount_lamports = 500_000_000
+    required_amount_lamports = 500_000_000  # 1 SOL = 1,000,000,000 Lamports
 
     if not tx_hash:
         raise HTTPException(status_code=400, detail="Transaction hash is missing.")
@@ -51,6 +64,8 @@ async def check_transaction(tx_hash: str):
             if not tx_data:
                 raise HTTPException(status_code=404, detail="Transaction not found.")
 
+            # Проверка получателя и суммы
+            # Ищем, была ли транзакция на наш кошелёк с правильной суммой
             is_valid = False
             for instruction in tx_data['transaction']['message']['instructions']:
                 if (
@@ -71,6 +86,7 @@ async def check_transaction(tx_hash: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
+
 @router.post("/create")
 async def create_ticket(
     request: Request,
@@ -81,7 +97,8 @@ async def create_ticket(
     wallet_address: str = Form(None),
     country_code: str = Form(...),
     file: UploadFile = File(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
+
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -103,9 +120,10 @@ async def create_ticket(
         status="active"
     )
     db.add(new_ticket)
-    await db.commit()
-    await db.refresh(new_ticket)
+    db.commit()
+    db.refresh(new_ticket)
 
+    # 👉 Определим по заголовку, что ожидается: HTML или JSON
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse("ticket_success.html", {
             "request": request,
@@ -127,17 +145,15 @@ async def create_ticket(
         })
 
 @router.post("/{ticket_id}/archive")
-async def archive_ticket(
+def archive_ticket(
     ticket_id: UUID,
     admin_key: str = Query(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    result = await db.execute(select(Ticket).filter(Ticket.id == ticket_id))
-    ticket = result.scalar_one_or_none()
-    
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     
@@ -146,85 +162,81 @@ async def archive_ticket(
     
     ticket.is_archived = True
     ticket.archived_at = datetime.now()
-    await db.commit()
+    db.commit()
     
     return {"message": "Ticket archived successfully", "ticket_id": ticket_id}
 
 @router.post("/{ticket_id}/unarchive")
-async def unarchive_ticket(
+def unarchive_ticket(
     ticket_id: UUID,
     admin_key: str = Query(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    result = await db.execute(select(Ticket).filter(Ticket.id == ticket_id))
-    ticket = result.scalar_one_or_none()
-    
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     
     ticket.is_archived = False
     ticket.archived_at = None
-    await db.commit()
+    db.commit()
     
     return {"message": "Ticket unarchived successfully", "ticket_id": ticket_id}
 
 @router.get("/search")
-async def search_ticket(number: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Ticket).filter(
+def search_ticket(number: str, db: Session = Depends(get_db)):
+    # Ищем только среди неархивированных билетов
+    ticket = db.query(Ticket).filter(
         Ticket.ticket_number == number,
         Ticket.is_archived == False
-    ))
-    ticket = result.scalar_one_or_none()
-    
+    ).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     return ticket
 
+
 @router.put("/{ticket_number}/winner")
-async def declare_winner(
+def declare_winner(
     ticket_number: str,
     prize_description: str = Query(...),
     admin_key: str = Query(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    result = await db.execute(select(Ticket).filter(
+    # Ищем только среди неархивированных билетов
+    ticket = db.query(Ticket).filter(
         Ticket.ticket_number == ticket_number,
         Ticket.is_archived == False
-    ))
-    ticket = result.scalar_one_or_none()
-    
+    ).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     ticket.is_winner = True
     ticket.status = "winner"
     ticket.prize_description = prize_description
-    await db.commit()
-    await db.refresh(ticket)
-    
+    db.commit()
+    db.refresh(ticket)
     return {
         "detail": f"Ticket '{ticket_number}' marked as winner",
         "prize": prize_description
     }
 
+
 @router.delete("/{ticket_id}")
-async def delete_ticket(
+def delete_ticket(
     ticket_id: UUID,
     admin_key: str = Query(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    result = await db.execute(select(Ticket).filter(Ticket.id == ticket_id))
-    ticket = result.scalar_one_or_none()
-    
+    # Можно удалять любые билеты (и архивные, и неархивированные)
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
@@ -232,66 +244,62 @@ async def delete_ticket(
     if os.path.exists(image_path):
         os.remove(image_path)
 
-    await db.delete(ticket)
-    await db.commit()
+    db.delete(ticket)
+    db.commit()
     
     return {
         "detail": f"Ticket {ticket_id} deleted",
         "archived": ticket.is_archived
     }
 
+
+# ✅ Удалить только неархивированные билеты
 @router.delete("/all/", response_model=dict)
-async def delete_all_tickets(x_admin_key: str = Header(...), db: AsyncSession = Depends(get_db)):
+def delete_all_tickets(x_admin_key: str = Header(...), db: Session = Depends(get_db)):
     if x_admin_key != ADMIN_KEY:
         raise HTTPException(status_code=403, detail="Access denied: Invalid admin key")
 
-    result = await db.execute(select(Ticket).filter(Ticket.is_archived == False))
-    tickets = result.scalars().all()
-    
-    for ticket in tickets:
-        await db.delete(ticket)
-    
-    await db.commit()
+    # Удаляем только неархивированные билеты
+    deleted_count = db.query(Ticket).filter(Ticket.is_archived == False).delete()
+    db.commit()
     
     return {
         "status": "success", 
-        "deleted_count": len(tickets),
-        "message": f"Deleted {len(tickets)} non-archived tickets. Archived tickets were preserved."
+        "deleted_count": deleted_count,
+        "message": f"Deleted {deleted_count} non-archived tickets. Archived tickets were preserved."
     }
 
+# ✅ Удалить все архивные билеты (отдельная функция)
 @router.delete("/archived/all/", response_model=dict)
-async def delete_all_archived_tickets(x_admin_key: str = Header(...), db: AsyncSession = Depends(get_db)):
+def delete_all_archived_tickets(x_admin_key: str = Header(...), db: Session = Depends(get_db)):
     if x_admin_key != ADMIN_KEY:
         raise HTTPException(status_code=403, detail="Access denied: Invalid admin key")
 
-    result = await db.execute(select(Ticket).filter(Ticket.is_archived == True))
-    tickets = result.scalars().all()
-    
-    for ticket in tickets:
-        await db.delete(ticket)
-    
-    await db.commit()
+    # Удаляем только архивные билеты
+    deleted_count = db.query(Ticket).filter(Ticket.is_archived == True).delete()
+    db.commit()
     
     return {
         "status": "success", 
-        "deleted_count": len(tickets),
-        "message": f"Deleted {len(tickets)} archived tickets."
+        "deleted_count": deleted_count,
+        "message": f"Deleted {deleted_count} archived tickets."
     }
 
+# ✅ Удалить конкретный архивный билет
 @router.delete("/archived/{ticket_id}")
-async def delete_archived_ticket(
+def delete_archived_ticket(
     ticket_id: UUID,
     x_admin_key: str = Header(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     if x_admin_key != ADMIN_KEY:
         raise HTTPException(status_code=403, detail="Access denied: Invalid admin key")
 
-    result = await db.execute(select(Ticket).filter(
+    # Удаляем только если билет архивирован
+    ticket = db.query(Ticket).filter(
         Ticket.id == ticket_id,
         Ticket.is_archived == True
-    ))
-    ticket = result.scalar_one_or_none()
+    ).first()
     
     if not ticket:
         raise HTTPException(status_code=404, detail="Archived ticket not found")
@@ -300,21 +308,22 @@ async def delete_archived_ticket(
     if os.path.exists(image_path):
         os.remove(image_path)
 
-    await db.delete(ticket)
-    await db.commit()
+    db.delete(ticket)
+    db.commit()
     
     return {
         "detail": f"Archived ticket {ticket_id} deleted",
         "message": "Archived ticket was permanently deleted"
     }
 
+
 @router.get("/winners/html", response_class=HTMLResponse)
-async def show_winners(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Ticket).filter(
+def show_winners(db: Session = Depends(get_db)):
+    # Только неархивированные победители
+    winners = db.query(Ticket).filter(
         Ticket.is_winner == True,
         Ticket.is_archived == False
-    ).order_by(Ticket.created_at.desc()))
-    winners = result.scalars().all()
+    ).order_by(Ticket.created_at.desc()).all()
 
     html = """
     <html>
@@ -406,53 +415,54 @@ async def show_winners(db: AsyncSession = Depends(get_db)):
     """
     return HTMLResponse(content=html)
 
+
 @router.get("/search/html", response_class=HTMLResponse)
-async def search_ticket_form(request: Request):
+def search_ticket_form(request: Request):
     return templates.TemplateResponse("search_form.html", {"request": request})
 
+
 @router.get("/search/result", response_class=HTMLResponse)
-async def search_ticket_result(request: Request, number: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Ticket).filter(
+def search_ticket_result(request: Request, number: str, db: Session = Depends(get_db)):
+    # Ищем только среди неархивированных билетов
+    ticket = db.query(Ticket).filter(
         Ticket.ticket_number == number,
         Ticket.is_archived == False
-    ))
-    ticket = result.scalar_one_or_none()
-    
+    ).first()
     return templates.TemplateResponse("search_result.html", {
         "request": request,
         "ticket": ticket,
         "not_found": ticket is None
     })
 
+
 @router.get("/all/html", response_class=HTMLResponse)
-async def show_all_tickets(
+def show_all_tickets(
     request: Request,
     number: str = Query(None),
     winners_only: bool = Query(False),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
-    stmt = select(Ticket).filter(Ticket.is_archived == False)
+    # Только неархивированные билеты
+    query = db.query(Ticket).filter(Ticket.is_archived == False)
     found = None
 
     if number:
-        stmt = stmt.filter(Ticket.ticket_number.ilike(f"%{number}%"))
-        result = await db.execute(stmt)
-        found = result.scalars().first() is not None
+        query = query.filter(Ticket.ticket_number.ilike(f"%{number}%"))
+        found = query.count() > 0
 
     if winners_only:
-        stmt = stmt.filter(Ticket.is_winner == True)
+        query = query.filter(Ticket.is_winner == True)
 
-    result = await db.execute(stmt.order_by(Ticket.created_at.desc()))
-    tickets = result.scalars().all()
+    tickets = query.order_by(Ticket.created_at.desc()).all()
 
-    result = await db.execute(select(Ticket).filter(
+    # Только неархивированные избранные билеты
+    featured_tickets = db.query(Ticket).filter(
         Ticket.is_featured == True,
         Ticket.is_archived == False
-    ))
-    featured_tickets = result.scalars().all()
+    ).all()
 
-    result = await db.execute(select(Ticket).filter(Ticket.is_archived == False))
-    total_tickets_count = len(result.scalars().all())
+    # Получаем общее количество неархивированных билетов
+    total_tickets_count = db.query(Ticket).filter(Ticket.is_archived == False).count()
 
     return templates.TemplateResponse("all_tickets.html", {
         "request": request,
@@ -465,52 +475,48 @@ async def show_all_tickets(
     })
 
 @router.put("/{ticket_id}/feature")
-async def feature_ticket(
+def feature_ticket(
     ticket_id: UUID,
     is_featured: bool = Query(...),
     admin_key: str = Query(...),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    result = await db.execute(select(Ticket).filter(Ticket.id == ticket_id))
-    ticket = result.scalar_one_or_none()
-    
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     ticket.is_featured = is_featured
-    await db.commit()
-    await db.refresh(ticket)
-    
+    db.commit()
+    db.refresh(ticket)
     return {"detail": f"Ticket {ticket_id} featured = {is_featured}"}
 
 @router.get("/count")
-async def get_ticket_count(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Ticket).filter(Ticket.is_archived == False))
-    count = len(result.scalars().all())
+def get_ticket_count(db: Session = Depends(get_db)):
+    # Считаем только неархивированные билеты
+    count = db.query(Ticket).filter(Ticket.is_archived == False).count()
     return {"count": count}
 
 @router.get("/create", response_class=HTMLResponse)
-async def create_ticket_form(request: Request):
+def create_ticket_form(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
 
 @router.get("/last_ticket", response_model=TicketSchema)
-async def get_last_ticket(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Ticket).filter(
+def get_last_ticket(db: Session = Depends(get_db)):
+    # Получаем последний неархивированный билет
+    ticket = db.query(Ticket).filter(
         Ticket.is_archived == False
-    ).order_by(Ticket.created_at.desc()))
-    ticket = result.scalar_one_or_none()
-    
+    ).order_by(Ticket.created_at.desc()).first()
     if not ticket:
         raise HTTPException(status_code=404, detail="No tickets found")
     return ticket
 
+# 🆕 Эндпоинт для получения архивных билетов
 @router.get("/archived")
-async def get_archived_tickets(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Ticket).filter(
+def get_archived_tickets(db: Session = Depends(get_db)):
+    archived_tickets = db.query(Ticket).filter(
         Ticket.is_archived == True
-    ).order_by(Ticket.archived_at.desc()))
-    archived_tickets = result.scalars().all()
+    ).order_by(Ticket.archived_at.desc()).all()
     return archived_tickets
