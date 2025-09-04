@@ -14,6 +14,7 @@ import logging
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+import sqlalchemy as sa
 
 # Загружаем переменные окружения
 env_path = Path(__file__).parent.parent / '.env'
