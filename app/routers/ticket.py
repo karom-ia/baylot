@@ -14,8 +14,12 @@ import shutil
 import os
 from uuid import uuid4, UUID
 from werkzeug.utils import secure_filename
+import httpx # ✅ <-- Добавлено
+from pydantic import BaseModel
+from datetime import datetime  # Добавьте эту строку
 
-
+# ✅ Замените на ваш реальный адрес кошелька
+SOLANA_WALLET_ADDRESS = "4NuDayX7fiZT4Teo9HGBNqCRKNV6bRsPFAY6JkjYC9rN"
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
@@ -30,6 +34,57 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# ✅ Новый маршрут для проверки транзакции
+@router.get("/check-transaction")
+async def check_transaction(tx_hash: str):
+    """
+    Проверяет транзакцию в блокчейне Solana на валидность.
+    """
+    SOLANA_API_URL = "https://api.mainnet-beta.solana.com"
+    required_amount_lamports = 1_000_000_000  # 1 SOL = 1,000,000,000 Lamports
+
+    if not tx_hash:
+        raise HTTPException(status_code=400, detail="Transaction hash is missing.")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                SOLANA_API_URL,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "getConfirmedTransaction",
+                    "params": [tx_hash]
+                }
+            )
+            response.raise_for_status()
+            tx_data = response.json().get("result")
+
+            if not tx_data:
+                raise HTTPException(status_code=404, detail="Transaction not found.")
+
+            # Проверка получателя и суммы
+            # Ищем, была ли транзакция на наш кошелёк с правильной суммой
+            is_valid = False
+            for instruction in tx_data['transaction']['message']['instructions']:
+                if (
+                    instruction.get('programId') == '11111111111111111111111111111111'
+                    and instruction.get('parsed', {}).get('info', {}).get('destination') == SOLANA_WALLET_ADDRESS
+                    and instruction.get('parsed', {}).get('info', {}).get('lamports') >= required_amount_lamports
+                ):
+                    is_valid = True
+                    break
+
+            if is_valid:
+                return {"status": "success", "detail": "Transaction is valid."}
+            else:
+                raise HTTPException(status_code=400, detail="Transaction is not valid or does not meet the requirements (1 SOL to the correct address).")
+
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail=f"HTTP Error: {e.response.text}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 
 @router.post("/create")
@@ -89,8 +144,46 @@ async def create_ticket(
             "created_at": new_ticket.created_at.isoformat(),
         })
 
+@router.post("/{ticket_id}/archive")
+def archive_ticket(
+    ticket_id: UUID,
+    admin_key: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    if not ticket.is_winner:
+        raise HTTPException(status_code=400, detail="Only winner tickets can be archived")
+    
+    ticket.is_archived = True
+    ticket.archived_at = datetime.now()
+    db.commit()
+    
+    return {"message": "Ticket archived successfully", "ticket_id": ticket_id}
 
+@router.post("/{ticket_id}/unarchive")
+def unarchive_ticket(
+    ticket_id: UUID,
+    admin_key: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    if admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    ticket.is_archived = False
+    ticket.archived_at = None
+    db.commit()
+    
+    return {"message": "Ticket unarchived successfully", "ticket_id": ticket_id}
 @router.get("/search")
 def search_ticket(number: str, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.ticket_number == number).first()
@@ -335,4 +428,3 @@ def get_last_ticket(db: Session = Depends(get_db)):
     if not ticket:
         raise HTTPException(status_code=404, detail="No tickets found")
     return ticket
-

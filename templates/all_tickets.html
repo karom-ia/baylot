@@ -15,7 +15,7 @@
 
         /* ===== HEADER ===== */
         .custom-header {
-            max-width: 1260px;
+            max-width: 1300px;
             margin: 0 auto;
             border-radius: 10px;
             background: white;
@@ -83,6 +83,7 @@
             max-width: 600px;
             width: 100%;
             justify-content: center;
+            user-select: none;
         }
 
         .header-search input[type="text"] {
@@ -94,6 +95,7 @@
             min-width: 180px;
             outline: none;
             transition: all 0.2s ease;
+            user-select: none;
         }
 
         .header-search input[type="text"]:focus {
@@ -127,6 +129,7 @@
             padding: 8px 12px;
             border-radius: 10px;
             font-size: 14px;
+            user-select: none;
         }
 
         .winner-only-label:hover {
@@ -137,25 +140,6 @@
         .winner-only-label input {
             margin-right: 5px;
             transform: scale(1.2);
-        }
-
-        .wallet-button {
-            background: linear-gradient(135deg, #000000, #333333);
-            background: rgb(0, 0, 0, 0.9);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 15px;
-            transition: text-decoration 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .wallet-button:hover {
-            background: linear-gradient(135deg, #222222, #333333);
-            text-decoration: line-through;
         }
 
         /* ===== OTHER STYLES ===== */
@@ -181,9 +165,9 @@
         .ticket-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 40px;
             padding: 20px;
-            max-width: 1300px;
+            max-width: 1340px;
             margin: auto;
         }
 
@@ -223,7 +207,7 @@
         .ticket-status {
             margin-top: 8px;
             font-size: 15px;
-            color: #555;
+            color: black;
         }
 
         .winner {
@@ -247,6 +231,19 @@
             font-weight: bold;
             display: block;
             text-align: center;
+        }
+
+        .happy-star-main {
+            background: white;
+            color: #004085;
+            border-radius: 6px;
+            padding: 5px 10px;
+            margin-top: 10px;
+            display: inline-block;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            user-select: none;
         }
 
         .ticket-prize {
@@ -296,9 +293,49 @@
             border-radius: 6px;
             padding: 8px;
             cursor: pointer;
+            user-select: none;
         }
 
         .claim-form button:hover {
+            text-decoration: line-through;
+            background-color: rgba(253, 0, 130, 0.5);
+        }
+
+        .claim-form-main {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .claim-form-main input {
+            padding: 8px;
+            font-size: 14px;
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .claim-form-main input:focus {
+            border-color: #0BB3D9;
+            box-shadow: 0 0 6px rgba(11, 179, 217, 0.5);
+            background-color: transparent;
+            outline: none;
+            transition: all 0.1s ease;
+        }
+
+        .claim-form-main button {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .claim-form-main button:hover {
             text-decoration: line-through;
             background-color: rgba(253, 0, 130, 0.5);
         }
@@ -323,7 +360,7 @@
             color: white;
             padding: 40px 20px;
             border-radius: 20px;
-            max-width: 1260px;
+            max-width: 1300px;
             margin: 30px auto;
         }
 
@@ -372,6 +409,7 @@
             cursor: pointer;
             text-align: center;
             white-space: nowrap;
+            user-select: none;
         }
 
         .new-tickets-button:hover {
@@ -463,11 +501,44 @@
             text-decoration: none;
             color: #000;
             font-weight: 500;
-            transition: background 0.3s;
+            transition: background 0.2s;
+            user-select: none;
         }
 
         .icon-button:hover {
             background-color: #e0e0e0;
+        }
+        .icon-button-main {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgb(176, 132, 39, 0.2);
+            border-radius: 8px;
+            text-decoration: none;
+            color: #000;
+            font-weight: 500;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .icon-button-main:hover {
+            background: rgb(176, 132, 39, 0.4);
+        }
+        .icon-button-main-wallet {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgb(176, 132, 39, 0.2);
+            border-radius: 8px;
+            text-decoration: none;
+            color: #000;
+            font-weight: 500;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .icon-button-main-wallet:hover {
+            background: rgb(176, 132, 39, 0.4);
         }
 
         @media (max-width: 480px) {
@@ -631,17 +702,380 @@
                 color: white;
             }
         }
+
+.menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.menu-button { 
+    background: linear-gradient(135deg, #000000, #333333); 
+    background: rgb(0, 0, 0, 0.9); 
+    color: white; padding: 10px 20px; 
+    border: none; 
+    border-radius: 10px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    font-size: 15px; 
+    transition: text-decoration 0.2s ease; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+    user-select: none; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    text-align: center; 
+    white-space: nowrap; 
+} 
+
+.menu-button:hover { 
+    background: linear-gradient(135deg, #222222, #333333); 
+    text-decoration: line-through; 
+}
+
+/* МЕНЮ */
+.popup-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background: #222;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  padding: 10px 0;
+  width: 200px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 9;
+  overflow: hidden;
+}
+
+.popup-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.popup-menu li {
+  padding: 12px 20px;
+}
+
+.popup-menu li a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  transition: background 0.2s ease;
+}
+
+.popup-menu li:hover {
+  background-color: #333;
+}
+
+.popup-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
+  display: none;
+}
+
+/* ✅ МОБИЛЬНАЯ АДАПТАЦИЯ */
+@media (max-width: 600px) {
+  .menu-container {
+    width: 100%;
+  }
+
+  .menu-button {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .popup-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 10px auto 0 auto;
+    width: 100%;
+    max-width: none;
+    border-radius: 12px;
+  }
+}
+
+
+/* Базовая стилизация кнопки Buy Ticket */
+.main-button {
+    background: linear-gradient(135deg, #000000, #333333);
+    background: rgb(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    transition: text-decoration 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+}
+.main-button:hover {
+    background: linear-gradient(135deg, #222222, #333333);
+    text-decoration: line-through;
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+}
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+}
+.wallet-address-box {
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    word-wrap: break-word;
+    font-family: monospace;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-button {
+    background-color: rgba(40, 167, 69, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+.modal-button:hover {
+    background-color: #218838;
+}
+.status-message {
+    margin-top: 15px;
+    font-weight: bold;
+}
+.search-container {
+    margin: 25px 0 15px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.search-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 15px;
+    /* ✅ УЛУЧШЕНИЕ: Принудительный перенос слов для длинного текста */
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.search-title2 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 15px;
+    /* ✅ УЛУЧШЕНИЕ: Принудительный перенос слов для длинного текста */
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+}
+.search-form input[type="text"] {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+.search-form button {
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.search-form button:hover {
+    background-color: #0056b3;
+}
+.result-message {
+    margin-top: 15px;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 6px;
+    display: none;
+}
+.result-message.success {
+    color: #155724;
+    background-color: #d4edda;
+}
+.result-message.error {
+    color: #721c24;
+    background-color: #f8d7da;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+    .modal-content {
+        width: 77%; /* Немного увеличиваем ширину для лучшего использования пространства */
+        margin: 15% auto;
+    }
+    .wallet-address-box, .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .wallet-address-box span, .search-form input {
+        word-break: break-all;
+    }
+    .search-form button {
+        width: 100%;
+        white-space: normal;
+        word-break: break-word;
+    }
+    .search-title, h2, h3 {
+        word-break: break-word;
+        word-wrap: break-word; /* ⚠️ Добавил сюда тоже для надежности */
+    }
+}
+
+ /* Стили для страниц меню */
+        .page-content {
+            max-width: 1300px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-content h2 {
+            color: #FD0082;
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .page-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .page-content .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .page-content .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .page-content .feature-list li:before {
+            content: "•";
+            color: #FD0082;
+            font-weight: bold;
+            display: inline-block;
+            width: 20px;
+            margin-left: -20px;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .contact-info a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .archived-tickets {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <header class="custom-header">
+<header class="custom-header">
         <div class="header-container">
             <div class="header-left">
                 <img src="/static/images/baylot-main-logo.png" alt="Logo" style="height: 50px; border-radius: 12px;">
                 <a href="/" class="header-title interactive-title">
                     <strong>Metabase</strong>
-                    <small>cryptotickets</small>
+                    <small>cryptoticket</small>
                 </a>
                 <div class="header-tag" id="ticket-count-display">{{ tickets|length }} tickets</div>
             </div>
@@ -660,10 +1094,146 @@
                     </svg>
                     New Tickets <span id="ticket-count-box">(0)</span>
                 </button>
-                <button class="wallet-button">Baylot</button>
+                
+
+<button id="payButton" class="main-button">Buy ticket</button>
+
+<div class="menu-container">
+  <button id="payButton2" class="menu-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16">
+      <rect width="16" height="16" fill="none" />
+      <path fill="#fff" fill-rule="evenodd" d="M0 3.75A.75.75 0 0 1 .75 3h14.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 3.75M0 8a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 8m.75 3.5a.75.75 0 0 0 0 1.5h14.5a.75.75 0 0 0 0-1.5z" clip-rule="evenodd" stroke-width="0.5" stroke="#fff" />
+    </svg>
+  </button>
+
+  <div id="popupMenu" class="popup-menu hidden">
+    <ul>
+      <li><a href="#" data-page="status">Ticket status</a></li>
+      <li><a href="#" data-page="support">Support</a></li>
+      <li><a href="#" data-page="about">About</a></li>
+      <li><a href="#" data-page="archiv">Archiv</a></li>
+    </ul>
+  </div>
+</div>
+
+
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Pay for the ticket</h2>
+        <p>Send <strong>1 SOL</strong> to this address:</p>
+        <div class="wallet-address-box">
+            <span id="solanaAddress">4NuDayX7fiZT4Teo9HGBNqCRKNV6bRsPFAY6JkjYC9rN</span>
+            <button class="copy-button">Copy</button>
+        </div>
+        
+        <div class="search-container">
+            <h3 class="search-title">Verify the transaction</h3>
+            <h1 class="search-title2">and send us your transaction confirmation</h1>
+            <form class="search-form" id="transaction-search-form">
+                <input type="text" id="transactionHashInput" placeholder="Enter the transaction hash">
+                <button type="submit" id="search-button">Check</button>
+            </form>
+            <div id="result-message" class="result-message"></div>
+        </div>
+        
+        <button id="confirmButton" class="modal-button" style="display: none;">Send confirmation</button>
+    </div>
+</div>
+
+
             </div>
         </div>
     </header>
+
+    {% if status_page %}
+    <!-- Контент для страницы Ticket Status -->
+    <div class="page-content">
+        <h2>🎫 Ticket Status</h2>
+        <p>Check the status of your tickets and see if you're a winner!</p>
+        
+        <ul class="feature-list">
+            <li><strong>Active Tickets:</strong> Tickets that are still in the draw</li>
+            <li><strong>Winner Tickets:</strong> Tickets that have won prizes</li>
+            <li><strong>Claimed Prizes:</strong> Prizes that have been successfully claimed</li>
+            <li><strong>Pending Verification:</strong> Tickets awaiting prize claim verification</li>
+        </ul>
+        
+        <div class="contact-info">
+            <p>Need help with your ticket status? <a href="https://t.me/babaysupport" target="_blank">Contact support</a></p>
+        </div>
+    </div>
+
+    {% elif support_page %}
+    <!-- Контент для страницы Support -->
+    <div class="page-content">
+        <h2>🛟 Support</h2>
+        <p>We're here to help you with any questions or issues you might have.</p>
+        
+        <h3>Common Issues:</h3>
+        <ul class="feature-list">
+            <li>Ticket not showing up</li>
+            <li>Prize claim problems</li>
+            <li>Payment issues</li>
+            <li>Technical difficulties</li>
+        </ul>
+        
+        <div class="contact-info">
+            <h3>Contact Us:</h3>
+            <p>📧 Email: <a href="mailto:support@metabase.info">support@metabase.info</a></p>
+            <p>📱 Telegram: <a href="https://t.me/babaysupport" target="_blank">@babaysupport</a></p>
+            <p>💬 WhatsApp: <a href="https://wa.me/555571313" target="_blank">+992 5555 7 1313</a></p>
+            <p>⏰ Response time: Usually within 1 hours</p>
+        </div>
+    </div>
+
+    {% elif about_page %}
+    <!-- Контент для страницы About -->
+    <div class="page-content">
+        <h2>ℹ️ About Metabase</h2>
+        <p>Metabase is a revolutionary crypto ticket platform that brings transparency and excitement to digital collectibles and prize draws.</p>
+        
+        <h3>Our Mission:</h3>
+        <p>To create a fair, transparent, and engaging platform for crypto enthusiasts to participate in exciting prize draws and collect unique digital tickets.</p>
+        
+        <h3>Features:</h3>
+        <ul class="feature-list">
+            <li>Blockchain-based transparency</li>
+            <li>Instant prize verification</li>
+            <li>Secure SOLana transactions</li>
+            <li>Global accessibility</li>
+            <li>Community-driven events</li>
+        </ul>
+        
+        <h3>Technology:</h3>
+        <p>Built on SOLana blockchain for fast transactions and proven fairness through cryptographic verification.</p>
+    </div>
+
+{% elif archiv_page %}
+<!-- Контент для страницы Archiv -->
+<div class="page-content">
+    <h2>📚 Archiv</h2>
+    
+    {% if archived_tickets %}
+        {% for ticket in archived_tickets %}
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+            <strong>🏆 Winner: {{ ticket.ticket_number }}</strong><br>
+            <strong>👤 Owner:</strong> {{ ticket.holder_info or "Unknown" }}<br>
+            {% if ticket.prize_description %}
+            <strong>🎁 Prize:</strong> {{ ticket.prize_description }}<br>
+            {% endif %}
+            {% if ticket.archived_at %}
+            <strong>📅 Archived:</strong> {{ ticket.archived_at.strftime('%b %d, %Y') }}<br>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No archived tickets yet.</p>
+    {% endif %}
+</div>
+
+    {% else %}
+    <!-- Обычный контент главной страницы -->
 
     <div class="promo-banner">
         <div class="promo-content">
@@ -682,42 +1252,46 @@
             <img src="{{ ticket.image_url }}" alt="Билет {{ ticket.ticket_number }}">
             <div class="ticket-info">
                 <div class="ticket-number">🌟 The main winner: {{ ticket.ticket_number }}</div>
-                <div class="ticket-owner">👤 Owner: {{ ticket.holder_info or "не указан" }}</div>
+                <div class="ticket-owner">👤 Owner: {{ ticket.holder_info or "not specified" }}</div>
                 <div class="ticket-owner">
                     🔗 Social:
                     {% if ticket.social_link %}
-                    <a href="{{ ticket.social_link }}" target="_blank" class="icon-button" title="Open Social">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
-                            <path d="M6.94 3h3.44l3.62 5.17L18.98 3H21l-5.6 7.56L21.62 21h-3.44l-3.98-5.69L9.06 21H7.02l5.88-7.94L6.94 3Zm3.04 1.5H8.76l8.4 12h1.22l-8.4-12Z"/>
-                        </svg>
+                    <a href="http://{{ ticket.social_link }}" target="_blank" class="icon-button-main" title="Open X page">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin-right: 6px;">
+                         <rect width="24" height="24" fill="none" />
+                           <path fill="#242424" d="m17.687 3.063l-4.996 5.711l-4.32-5.711H2.112l7.477 9.776l-7.086 8.099h3.034l5.469-6.25l4.78 6.25h6.102l-7.794-10.304l6.625-7.571zm-1.064 16.06L5.654 4.782h1.803l10.846 14.34z" />
+                    </svg>
                         Page
                     </a>
                     {% else %}
-                    не указан
+                    not specified
                     {% endif %}
-                </div>
-                <div class="ticket-owner">
-                    💳 Wallet:
-                    {% if ticket.wallet_address %}
-                    <a href="https://solscan.io/account/{{ ticket.wallet_address }}" target="_blank" class="icon-button">
-                        {{ ticket.wallet_address[:4] }}...{{ ticket.wallet_address[-4:] }}
-                    </a>
-                    {% else %}
-                    не указан
-                    {% endif %}
-                </div>
+             </div>
+                 <div class="ticket-owner">
+                   <span style="margin-right: 5px;">💳 Wallet:</span>
+                   {% if ticket.wallet_address %}
+                      <a href="https://solscan.io/tx/{{ ticket.wallet_address }}" target="_blank" class="icon-button-main-wallet" title="Check the transaction">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin-right: 6px;">
+                      <rect width="24" height="24" fill="none" />
+                      <path fill="none" stroke="#242424" stroke-width="2" d="M2 7h18m-4-5l5 5l-5 5m6 5H4m4-5l-5 5l5 5" />
+                </svg> Transaction
+                 </a>
+                 {% else %}
+                 <span class="text-muted">not specified</span>
+                 {% endif %}
+            </div>
                 {% if ticket.country_code %}
                 <p>🌍 Country: {{ ticket.country_code|get_flag }} {{ ticket.country_code|country_name }}</p>
                 {% else %}
                 <p>🌍 Country: Unknown</p>
                 {% endif %}
                 {% if ticket.is_winner %}
-                <div class="happy-star">🌟 Happy Start</div>
+                <div class="happy-star-main">🌟 Happy Start</div>
                 <div class="ticket-winner winner">🏆 Winner</div>
                 {% if ticket.prize_description %}
                 <div class="ticket-prize">🎁 {{ ticket.prize_description }}</div>
                 {% endif %}
-                <div class="claim-form">
+                <div class="claim-form-main">
                     <input type="text" placeholder="Enter the ticket ID" id="input-{{ ticket.id }}">
                     <button type="button" onclick="checkID('{{ ticket.id }}')">Claim Prize</button>
                     <div class="claim-instruction" id="instruction-{{ ticket.id }}" style="display:none; margin-top: 10px;">
@@ -726,7 +1300,7 @@
                     <div class="contact-options" id="contacts-{{ ticket.id }}" style="display:none;">
                         <a href="https://t.me/BabaySupport" target="_blank">Telegram</a>
                         <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a>
-                        <a href="mailto:support@babay.io">Email</a>
+                        <a href="mailto:support@babay.ai">Email</a>
                     </div>
                 </div>
                 {% endif %}
@@ -749,31 +1323,35 @@
         <div class="ticket {% if ticket.is_winner %}winner-highlight{% endif %}">
             <img src="{{ ticket.image_url }}" alt="Билет {{ ticket.ticket_number }}">
             <div class="ticket-info">
-                <div class="ticket-number">🎟 Number: {{ ticket.ticket_number }}</div>
-                <div class="ticket-owner">👤 Owner: {{ ticket.holder_info or "не указан" }}</div>
+                <div class="ticket-number">🎟 Ticket number: {{ ticket.ticket_number }}</div>
+                <div class="ticket-owner">👤 Owner: {{ ticket.holder_info or "not specified" }}</div>
                 <div class="ticket-owner">
                     <span style="margin-right: 5px;">🔗 Social:</span>
                     {% if ticket.social_link %}
                     <a href="https://{{ ticket.social_link }}" target="_blank" class="icon-button" title="Open X page">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
-                            <path d="M6.94 3h3.44l3.62 5.17L18.98 3H21l-5.6 7.56L21.62 21h-3.44l-3.98-5.69L9.06 21H7.02l5.88-7.94L6.94 3Zm3.04 1.5H8.76l8.4 12h1.22l-8.4-12Z"/>
-                        </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin-right: 6px;">
+                         <rect width="24" height="24" fill="none" />
+                           <path fill="#242424" d="m17.687 3.063l-4.996 5.711l-4.32-5.711H2.112l7.477 9.776l-7.086 8.099h3.034l5.469-6.25l4.78 6.25h6.102l-7.794-10.304l6.625-7.571zm-1.064 16.06L5.654 4.782h1.803l10.846 14.34z" />
+                    </svg>
                         Page
                     </a>
                     {% else %}
-                    <span class="text-muted">не указан</span>
+                    <span class="text-muted">not specified</span>
                     {% endif %}
                 </div>
-                <div class="ticket-owner">
-                    <span style="margin-right: 5px;">💳 Wallet:</span>
-                    {% if ticket.wallet_address %}
-                    <a href="https://solscan.io/account/{{ ticket.wallet_address }}" target="_blank" class="icon-button" title="Check the wallet">
-                        {{ ticket.wallet_address[:4] }}...{{ ticket.wallet_address[-4:] }}
-                    </a>
-                    {% else %}
-                    <span class="text-muted">не указан</span>
-                    {% endif %}
-                </div>
+<div class="ticket-owner">
+    <span style="margin-right: 5px;">💳 Wallet:</span>
+    {% if ticket.wallet_address %}
+        <a href="https://solscan.io/tx/{{ ticket.wallet_address }}" target="_blank" class="icon-button" title="Check the transaction">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="margin-right: 6px;">
+    <rect width="24" height="24" fill="none" />
+    <path fill="none" stroke="#242424" stroke-width="2" d="M2 7h18m-4-5l5 5l-5 5m6 5H4m4-5l-5 5l5 5" />
+</svg>  Transaction
+        </a>
+    {% else %}
+    <span class="text-muted">not specified</span>
+    {% endif %}
+</div>
                 {% if ticket.country_code %}
                 <p>🌍 Country: {{ ticket.country_code|get_flag }} {{ ticket.country_code|country_name }}</p>
                 {% else %}
@@ -800,7 +1378,7 @@
                 {% endif %}
                 <div class="ticket-status">
                     {% if ticket.is_winner %}
-                    🔴 Winner ticket
+                    🔴 Winner ticket 
                     {% else %}
                     🟢 Active
                     {% endif %}
@@ -809,6 +1387,7 @@
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 
     <audio id="notify-sound" src="/static/sounds/thanos-snap-sound-effect.mp3" preload="auto"></audio>
 
@@ -823,6 +1402,118 @@
             alert("❌ Invalid ticket ID. Please enter your ticket ID.");
         }
     }
+    // Pay Button
+document.addEventListener('DOMContentLoaded', () => {
+    const payButton = document.getElementById('payButton');
+    const paymentModal = document.getElementById('paymentModal');
+    const closeButton = document.querySelector('.close-button');
+    const transactionHashInput = document.getElementById('transactionHashInput');
+    const confirmButton = document.getElementById('confirmButton');
+    const resultMessage = document.getElementById('result-message');
+    const searchButton = document.getElementById('search-button');
+    const searchForm = document.getElementById('transaction-search-form');
+
+    // Открыть модальное окно
+    payButton.onclick = () => {
+        paymentModal.style.display = 'block';
+    };
+
+    // Закрыть модальное окно
+    closeButton.onclick = () => {
+        paymentModal.style.display = 'none';
+        // Сбросить состояние формы при закрытии
+        resetModalState();
+    };
+
+    window.onclick = (event) => {
+        if (event.target == paymentModal) {
+            paymentModal.style.display = 'none';
+            resetModalState();
+        }
+    };
+    
+    // Копирование адреса кошелька
+    document.querySelector('.copy-button').onclick = () => {
+        const address = document.getElementById('solanaAddress').innerText;
+        navigator.clipboard.writeText(address).then(() => {
+            alert('The address has been copied!');
+        });
+    };
+
+    // ✨ НОВАЯ ЛОГИКА: Проверка транзакции
+    searchForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const txHash = transactionHashInput.value.trim();
+        
+        if (!txHash) {
+            resultMessage.innerText = 'Please enter the transaction hash.';
+            resultMessage.className = 'result-message error';
+            resultMessage.style.display = 'block';
+            return;
+        }
+        
+        searchButton.disabled = true;
+        searchButton.innerText = 'Checking...';
+        resultMessage.style.display = 'none';
+        confirmButton.style.display = 'none';
+
+        try {
+            const response = await fetch(`/tickets/check-transaction?tx_hash=${txHash}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                resultMessage.innerText = '✅ The transaction was successfully found and confirmed!';
+                resultMessage.className = 'result-message success';
+                confirmButton.style.display = 'block';
+            } else {
+                resultMessage.innerText = `❌ ${data.detail}`;
+                resultMessage.className = 'result-message error';
+            }
+        } catch (error) {
+            resultMessage.innerText = '❌ Error when verifying the transaction. Please try again.';
+            resultMessage.className = 'result-message error';
+        } finally {
+            resultMessage.style.display = 'block';
+            searchButton.disabled = false;
+            searchButton.innerText = 'Check';
+        }
+    });
+
+    // ✨ ОБНОВЛЕННАЯ ЛОГИКА: Отправка подтверждения в Telegram
+    confirmButton.onclick = () => {
+        const txHash = transactionHashInput.value.trim();
+        if (!txHash) {
+            alert("The hash of the transaction is missing.");
+            return;
+        }
+
+        const telegramUsername = 't.me/BabaySupport'; // <-- Замените на ваш логин
+        const message = `✅ Transaction confirmation:
+Хэш: ${txHash}
+Ссылка: https://solscan.io/tx/${txHash}`;
+        
+        const encodedMessage = encodeURIComponent(message);
+        
+        const telegramLink = `https://t.me/${telegramUsername}?text=${encodedMessage}`;
+        
+        window.open(telegramLink, '_blank');
+
+        resultMessage.innerText = '✅ Please send a message to Telegram.';
+        resultMessage.className = 'result-message success';
+        confirmButton.style.display = 'none';
+    };
+
+    // Функция для сброса состояния модального окна
+    function resetModalState() {
+        transactionHashInput.value = '';
+        resultMessage.style.display = 'none';
+        confirmButton.style.display = 'none';
+        searchButton.disabled = false;
+        searchButton.innerText = 'Check';
+    }
+});
+    //END Pay Button
+
 
     document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("searchForm").addEventListener("submit", function(e) {
@@ -897,6 +1588,45 @@
         document.addEventListener('keydown', enableSoundOnInteraction);
         document.addEventListener('scroll', enableSoundOnInteraction);
     });
+
+      const payButton2 = document.getElementById('payButton2');
+  const popupMenu = document.getElementById('popupMenu');
+
+  payButton2.addEventListener('click', (e) => {
+    e.stopPropagation();
+    popupMenu.classList.toggle('hidden');
+    popupMenu.classList.toggle('show');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!popupMenu.contains(e.target) && !payButton2.contains(e.target)) {
+      popupMenu.classList.add('hidden');
+      popupMenu.classList.remove('show');
+    }
+  });
+
+  // Добавьте эту функцию для навигации по страницам меню
+function navigateToPage(pageType) {
+    // Закрываем меню
+    popupMenu.classList.add('hidden');
+    popupMenu.classList.remove('show');
+    
+    // Перенаправляем на главную страницу с параметром
+    window.location.href = `/?${pageType}=true`;
+}
+
+// Добавьте обработчики для пунктов меню
+document.addEventListener('DOMContentLoaded', () => {
+    const menuItems = document.querySelectorAll('#popupMenu a[data-page]');
+    
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageType = item.getAttribute('data-page');
+            navigateToPage(pageType);
+        });
+    });
+});
 </script>
 
 </body>

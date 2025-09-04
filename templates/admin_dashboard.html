@@ -43,6 +43,44 @@
             justify-content: center;
             flex-wrap: wrap;
         }
+        /* Стили для таблицы */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #0984e3;
+            color: white;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .archive-btn {
+            padding: 6px 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .unarchive-btn {
+            padding: 6px 12px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -61,5 +99,82 @@
             <a class="btn" href="/admin/winners">Список</a>
         </div>
     </div>
+
+    {% if winner_tickets %}
+    <h2>🏆 Выигрышные билеты</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Номер билета</th>
+                <th>Владелец</th>
+                <th>Приз</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in winner_tickets %}
+            <tr>
+                <td>{{ ticket.ticket_number }}</td>
+                <td>{{ ticket.holder_info or "Не указан" }}</td>
+                <td>{{ ticket.prize_description or "Не указан" }}</td>
+                <td>
+                    {% if not ticket.is_archived %}
+<form action="/tickets/{{ ticket.id }}/archive?admin_key=MySuperSecretKeyForDeleteAll2133" method="post" style="display: inline;">
+    <button onclick="unarchiveTicket('{{ ticket.id }}')" class="unarchive-btn">📂 Unarchive</button>
+</form>
+                    {% else %}
+                    <form action="/tickets/{{ ticket.id }}/unarchive" method="post" style="display: inline;">
+                        <input type="hidden" name="admin_key" value="MySuperSecretKeyForDeleteAll2133">
+                        <button type="submit" class="unarchive-btn">📂 Unarchive</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Нет выигрышных билетов</p>
+    {% endif %}
+
+    <script>
+function archiveTicket(ticketId) {
+    if (confirm('Архивировать этот билет?')) {
+        fetch(`/tickets/${ticketId}/archive?admin_key=MySuperSecretKeyForDeleteAll2133`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch(error => {
+            alert('Ошибка архивации: ' + error);
+        });
+    }
+}
+
+function unarchiveTicket(ticketId) {
+    if (confirm('Восстановить этот билет из архива?')) {
+        fetch(`/tickets/${ticketId}/unarchive?admin_key=MySuperSecretKeyForDeleteAll2133`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch(error => {
+            alert('Ошибка восстановления: ' + error);
+        });
+    }
+}
+
+.then(data => {
+    alert(data.message);
+    location.reload();  // ← Добавьте эту строку
+})
+</script>
+
 </body>
 </html>
