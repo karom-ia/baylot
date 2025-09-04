@@ -1210,6 +1210,689 @@
     break-inside: avoid;
 }
 /* END Раздел архив */
+
+/* Start раздел Github */
+
+.technology-section {
+    position: relative;
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #007bff;
+}
+
+.github-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #24292e;
+    padding: 8px 12px;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e1e4e8;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.github-button:hover {
+    background: #f6f8fa;
+    border-color: #d0d7de;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .technology-section {
+        padding: 15px;
+    }
+    
+    .github-button {
+        position: static;
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        max-width: 200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .github-button {
+        padding: 10px 15px;
+    }
+    
+    .github-button span {
+        font-size: 14px;
+    }
+}
+/* END раздел Github */
+
+.prizes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.prize-category {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #007bff;
+}
+
+.prize-list {
+    margin-top: 15px;
+}
+
+.prize-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin: 10px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #28a745;
+}
+
+.prize-emoji {
+    font-size: 2em;
+    flex-shrink: 0;
+}
+
+.prize-details h4 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+}
+
+.prize-amount {
+    font-weight: bold;
+    color: #27ae60;
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.prize-description {
+    margin: 5px 0 0 0;
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.prize-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 30px;
+}
+
+.prize-info ol, .prize-info ul {
+    padding-left: 20px;
+}
+
+.prize-info li {
+    margin: 10px 0;
+}
+
+.important-notes {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .prizes-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .prize-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .prize-emoji {
+        font-size: 1.5em;
+    }
+}
+
+/* Стили для нового раздела Baylot */
+.baylot-prizes-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 40px 0;
+}
+
+.baylot-prizes-section h3 {
+    color: white;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.baylot-prizes-section > p {
+    text-align: center;
+    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+.baylot-prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.baylot-prize-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.baylot-prize-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.prize-icon {
+    font-size: 2.5em;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.baylot-prize-card h4 {
+    color: #fff;
+    margin: 0 0 15px 0;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.baylot-prize-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.baylot-prize-card li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.baylot-prize-card li:last-child {
+    border-bottom: none;
+}
+
+.baylot-info-box {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.baylot-info-box h4 {
+    color: #fff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.baylot-info-box p {
+    text-align: center;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.baylot-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.stat {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .baylot-prizes-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .baylot-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .baylot-prizes-section {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .baylot-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat {
+        padding: 12px;
+    }
+    
+    .stat-number {
+        font-size: 1.5em;
+    }
+}
+
+/* Стили для ссылки Baylot */
+.menu-baylot-link {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 8px;
+    margin: 5px 10px;
+    text-align: center;
+    border: 2px solid #ff9f43;
+}
+
+.menu-baylot-link:hover {
+    background: linear-gradient(135deg, #ee5a24 0%, #ff9f43 100%) !important;
+    
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* Стили для страницы Ticket Status */
+.status-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.status-header h2 {
+    color: #FD0082;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.status-header p {
+    color: #666;
+    font-size: 1.1em;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.ticket-search-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px;
+    border-radius: 20px;
+    margin: 40px 0;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ticket-search-form {
+    margin: 0;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#ticketNumberInput {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    background: white;
+    color: #333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#ticketNumberInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.search-btn {
+    padding: 16px 28px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.search-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.search-results {
+    margin: 40px 0;
+    padding: 0;
+}
+
+.status-info {
+    margin: 50px 0;
+}
+
+.status-info h3 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.status-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.status-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 25px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid;
+    transition: transform 0.3s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-5px);
+}
+
+.status-active { border-left-color: #28a745; }
+.status-winner { border-left-color: #ffc107; }
+.status-archived { border-left-color: #6c757d; }
+.status-claimed { border-left-color: #17a2b8; }
+
+.status-icon {
+    font-size: 2.5em;
+    flex-shrink: 0;
+}
+
+.status-content h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+}
+
+.status-content p {
+    margin: 0 0 5px 0;
+    color: #7f8c8d;
+    font-size: 0.95em;
+}
+
+.status-content small {
+    color: #a0a0a0;
+    font-size: 0.85em;
+}
+
+.status-instructions {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 30px;
+    border-radius: 15px;
+    border-left: 5px solid #007bff;
+    margin: 40px 0;
+}
+
+.status-instructions h3 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.status-instructions ol {
+    padding-left: 25px;
+}
+
+.status-instructions li {
+    margin: 15px 0;
+    color: #495057;
+    font-size: 1.05em;
+    line-height: 1.6;
+}
+
+.tip-box {
+    background: rgba(255, 193, 7, 0.2);
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border-left: 4px solid #ffc107;
+}
+
+/* Стили для результатов поиска */
+.ticket-result {
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    margin: 20px 0;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid;
+    animation: fadeInUp 0.5s ease;
+}
+
+.ticket-result.winner {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left-color: #ffc107;
+}
+
+.ticket-result.active {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-left-color: #28a745;
+}
+
+.ticket-result.archived {
+    background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+    border-left-color: #6c757d;
+}
+
+.ticket-result.claimed {
+    background: linear-gradient(135deg, #cce5ff 0%, #b8daff 100%);
+    border-left-color: #17a2b8;
+}
+
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 0.95em;
+    display: inline-block;
+}
+
+/* Стили для раздела поддержки */
+.support-section {
+    background: linear-gradient(135deg, #fd0082 0%, #ff3cac 5%);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    margin: 50px 0;
+}
+
+.support-section h3 {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.support-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.support-option {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.support-icon {
+    font-size: 2.5em;
+    flex-shrink: 0;
+}
+
+.support-content h4 {
+    margin: 0 0 5px 0;
+    color: white;
+}
+
+.support-content p {
+    margin: 0 0 3px 0;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.support-content small {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9em;
+}
+
+.support-note {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.support-note p {
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.support-note ul {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.support-note li {
+    margin: 8px 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .ticket-search-container {
+        padding: 25px;
+        margin: 30px 0;
+    }
+    
+    .search-input-group {
+        flex-direction: column;
+    }
+    
+    #ticketNumberInput {
+        width: 100%;
+    }
+    
+    .search-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .status-cards,
+    .support-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .support-option {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .ticket-search-container {
+        padding: 20px;
+    }
+    
+    #ticketNumberInput {
+        padding: 14px 18px;
+        font-size: 14px;
+    }
+    
+    .search-btn {
+        padding: 14px 20px;
+    }
+    
+    .status-instructions,
+    .support-section {
+        padding: 25px;
+    }
+}
     </style>
 </head>
 <body>
@@ -1253,10 +1936,12 @@
 
   <div id="popupMenu" class="popup-menu hidden">
     <ul>
+      <li><a href="https://link" target="_blank" rel="noopener noreferrer" class="menu-baylot-link">🎮 Baylot</a></li>
       <li><a href="#" data-page="status">Ticket status</a></li>
       <li><a href="#" data-page="support">Support</a></li>
       <li><a href="#" data-page="about">About</a></li>
       <li><a href="#" data-page="archiv">Archiv</a></li>
+      <li><a href="#" data-page="prizes">🏆 Prizes</a></li>  <!-- Новая строка -->
     </ul>
   </div>
 </div>
@@ -1266,7 +1951,7 @@
     <div class="modal-content">
         <span class="close-button">&times;</span>
         <h2>Pay for the ticket</h2>
-        <p>Send <strong>1 SOL</strong> to this address:</p>
+        <p>Send <strong>0.5 SOL</strong> to this address:</p>
         <div class="wallet-address-box">
             <span id="solanaAddress">4NuDayX7fiZT4Teo9HGBNqCRKNV6bRsPFAY6JkjYC9rN</span>
             <button class="copy-button">Copy</button>
@@ -1292,22 +1977,136 @@
     </header>
 
     {% if status_page %}
-    <!-- Контент для страницы Ticket Status -->
-    <div class="page-content">
+<!-- Контент для страницы Ticket Status -->
+<div class="page-content">
+    <div class="status-header">
         <h2>🎫 Ticket Status</h2>
         <p>Check the status of your tickets and see if you're a winner!</p>
+    </div>
+    
+    <!-- Поисковик для статуса билета -->
+    <div class="ticket-search-container">
+        <form class="ticket-search-form" id="ticketStatusForm">
+            <div class="search-input-group">
+                <input 
+                    type="text" 
+                    id="ticketNumberInput" 
+                    placeholder="Enter your ticket number..." 
+                    required
+                >
+                <button type="submit" class="search-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search Status
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="search-results" id="searchResults" style="display: none;">
+        <!-- Здесь будут отображаться результаты поиска -->
+    </div>
+
+    <div class="status-info">
+        <h3>📊 Understanding Ticket Status</h3>
         
-        <ul class="feature-list">
-            <li><strong>Active Tickets:</strong> Tickets that are still in the draw</li>
-            <li><strong>Winner Tickets:</strong> Tickets that have won prizes</li>
-            <li><strong>Claimed Prizes:</strong> Prizes that have been successfully claimed</li>
-            <li><strong>Pending Verification:</strong> Tickets awaiting prize claim verification</li>
-        </ul>
-        
-        <div class="contact-info">
-            <p>Need help with your ticket status? <a href="https://t.me/babaysupport" target="_blank">Contact support</a></p>
+        <div class="status-cards">
+            <div class="status-card status-active">
+                <div class="status-icon">🟢</div>
+                <div class="status-content">
+                    <h4>Active</h4>
+                    <p>Ticket is participating in current draws</p>
+                    <small>Still in the running for prizes</small>
+                </div>
+            </div>
+            
+            <div class="status-card status-winner">
+                <div class="status-icon">🏆</div>
+                <div class="status-content">
+                    <h4>Winner</h4>
+                    <p>Ticket has won a prize! Claim your reward</p>
+                    <small>Congratulations! Follow claim process</small>
+                </div>
+            </div>
+            
+            <div class="status-card status-archived">
+                <div class="status-icon">📁</div>
+                <div class="status-content">
+                    <h4>Archived</h4>
+                    <p>Historical winning ticket from past draws</p>
+                    <small>Viewable in our permanent records</small>
+                </div>
+            </div>
+            
+            <div class="status-card status-claimed">
+                <div class="status-icon">✅</div>
+                <div class="status-content">
+                    <h4>Claimed</h4>
+                    <p>Prize has been successfully claimed</p>
+                    <small>Reward delivered to winner</small>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="status-instructions">
+        <h3>ℹ️ How to Check Your Ticket Status</h3>
+        <ol>
+            <li><strong>Enter your ticket number</strong> in the search box above</li>
+            <li><strong>Click "Search Status"</strong> to check your ticket information</li>
+            <li><strong>View detailed status</strong> including prize information if you won</li>
+            <li><strong>Follow claim instructions</strong> if you're a winner</li>
+        </ol>
+        
+        <div class="tip-box">
+            <strong>💡 Tip:</strong> Your ticket number can be found on your purchase confirmation telegram or transaction details.
+        </div>
+    </div>
+
+    <!-- Добавляем обратно раздел поддержки -->
+    <div class="support-section">
+        <h3>🛟 Need Help With Your Ticket?</h3>
+        <div class="support-options">
+            <div class="support-option">
+                <div class="support-icon">📧</div>
+                <div class="support-content">
+                    <h4>Email Support</h4>
+                    <p>support@metabase.info</p>
+                    <small>Typically responds within 1 hour</small>
+                </div>
+            </div>
+            
+            <div class="support-option">
+                <div class="support-icon">📱</div>
+                <div class="support-content">
+                    <h4>Telegram</h4>
+                    <p>@babaysupport</p>
+                    <small>Instant messaging support</small>
+                </div>
+            </div>
+            
+            <div class="support-option">
+                <div class="support-icon">💬</div>
+                <div class="support-content">
+                    <h4>WhatsApp</h4>
+                    <p>+992 5555 7 1313</p>
+                    <small>Text or call support</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="support-note">
+            <p>Our support team is available to help you with:</p>
+            <ul>
+                <li>Ticket status inquiries</li>
+                <li>Prize claim assistance</li>
+                <li>Payment issues</li>
+                <li>Technical difficulties</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
     {% elif support_page %}
     <!-- Контент для страницы Support -->
@@ -1332,27 +2131,37 @@
         </div>
     </div>
 
-    {% elif about_page %}
-    <!-- Контент для страницы About -->
-    <div class="page-content">
-        <h2>ℹ️ About Metabase</h2>
-        <p>Metabase is a revolutionary crypto ticket platform that brings transparency and excitement to digital collectibles and prize draws.</p>
-        
-        <h3>Our Mission:</h3>
-        <p>To create a fair, transparent, and engaging platform for crypto enthusiasts to participate in exciting prize draws and collect unique digital tickets.</p>
-        
-        <h3>Features:</h3>
-        <ul class="feature-list">
-            <li>Blockchain-based transparency</li>
-            <li>Instant prize verification</li>
-            <li>Secure SOLana transactions</li>
-            <li>Global accessibility</li>
-            <li>Community-driven events</li>
-        </ul>
-        
+{% elif about_page %}
+<!-- Контент для страницы About -->
+<div class="page-content">
+    <h2>ℹ️ About Metabase</h2>
+    <p>Metabase is a revolutionary crypto ticket platform that brings transparency and excitement to digital collectibles and prize draws.</p>
+    
+    <h3>Our Mission:</h3>
+    <p>To create a fair, transparent, and engaging platform for crypto enthusiasts to participate in exciting prize draws and collect unique digital tickets.</p>
+    
+    <h3>Features:</h3>
+    <ul class="feature-list">
+        <li>Blockchain-based transparency</li>
+        <li>Instant prize verification</li>
+        <li>Secure SOLana transactions</li>
+        <li>Global accessibility</li>
+        <li>Community-driven events</li>
+        <li>Open Source on GitHub</li>
+    </ul>
+    
+    <div class="technology-section">
         <h3>Technology:</h3>
         <p>Built on SOLana blockchain for fast transactions and proven fairness through cryptographic verification.</p>
+        
+        <a href="https://github.com/karom-ia/baylot" target="_blank" rel="noopener noreferrer" class="github-button">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            <span>Open Source on GitHub</span>
+        </a>
     </div>
+</div>
 
 {% elif archiv_page %}
 <!-- Контент для страницы Archiv -->
@@ -1472,6 +2281,177 @@
                 <li>FastAPI backend for high performance</li>
                 <li>Blockchain verification for transparency</li>
                 <li>SOLana integration for crypto transactions</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% elif prizes_page %}
+<!-- Контент для страницы Prizes -->
+<div class="page-content">
+    <h2>🏆 Prize Information</h2>
+    <p>Discover the amazing prizes available for our winners. Each ticket gives you a chance to win incredible rewards!</p>
+    
+    <div class="prizes-container">
+        <div class="prize-category">
+            <h3>🎯 Grand Prizes</h3>
+            <div class="prize-list">
+                <div class="prize-item">
+                    <span class="prize-emoji">🥇</span>
+                    <div class="prize-details">
+                        <h4>First Prize</h4>
+                        <p class="prize-amount">5 SOL + Exclusive NFT</p>
+                        <p class="prize-description">The ultimate prize package for our top winner</p>
+                    </div>
+                </div>
+                
+                <div class="prize-item">
+                    <span class="prize-emoji">🥈</span>
+                    <div class="prize-details">
+                        <h4>Second Prize</h4>
+                        <p class="prize-amount">3 SOL</p>
+                        <p class="prize-description">Substantial reward for our runner-up</p>
+                    </div>
+                </div>
+                
+                <div class="prize-item">
+                    <span class="prize-emoji">🥉</span>
+                    <div class="prize-details">
+                        <h4>Third Prize</h4>
+                        <p class="prize-amount">1 SOL</p>
+                        <p class="prize-description">Great prize for our third place winner</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prize-category">
+            <h3>🎁 Special Prizes</h3>
+            <div class="prize-list">
+                <div class="prize-item">
+                    <span class="prize-emoji">🎨</span>
+                    <div class="prize-details">
+                        <h4>NFT Collection</h4>
+                        <p class="prize-amount">Exclusive Digital Art</p>
+                        <p class="prize-description">Unique NFTs from featured artists</p>
+                    </div>
+                </div>
+                
+                <div class="prize-item">
+                    <span class="prize-emoji">💎</span>
+                    <div class="prize-details">
+                        <h4>Premium Memberships</h4>
+                        <p class="prize-amount">VIP Access</p>
+                        <p class="prize-description">Exclusive platform benefits</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prize-category">
+            <h3>🗃️ Best Prizes</h3>
+            <div class="prize-list">
+                <div class="prize-item">
+                    <span class="prize-emoji">⭐</span>
+                    <div class="prize-details">
+                        <h4>Cryptocurrency</h4>
+                        <p class="prize-amount">$BAB $SOL</p>
+                        <p class="prize-description">Weekly prize for lucky participants</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- НОВЫЙ РАЗДЕЛ - Призы Baylot -->
+    <div class="baylot-prizes-section">
+        <h3>🏆 All Baylot Game Prizes</h3>
+        <p>Explore the complete prize pool available in the Baylot game ecosystem</p>
+        
+        <div class="baylot-prizes-grid">
+            <div class="baylot-prize-card">
+                <div class="prize-icon">🚗</div>
+                <h4>Grand Automotive Prizes</h4>
+                <ul>
+                    <li>BMW M8 Competition</li>
+                    <li>Tesla Model S Plaid</li>
+                    <li>Mercedes-Benz S-Class</li>
+                </ul>
+            </div>
+            
+            <div class="baylot-prize-card">
+                <div class="prize-icon">💎</div>
+                <h4>Crypto Rewards</h4>
+                <ul>
+                    <li>10-50 SOL packages</li>
+                    <li>Bitcoin prizes</li>
+                    <li>Exclusive NFTs</li>
+                    <li>Staking packages</li>
+                </ul>
+            </div>
+            
+            <div class="baylot-prize-card">
+                <div class="prize-icon">✈️</div>
+                <h4>Luxury Experiences</h4>
+                <ul>
+                    <li>All-inclusive vacations</li>
+                    <li>Luxury hotel stays</li>
+                    <li>Supercar driving experiences</li>
+                    <li>VIP event tickets</li>
+                </ul>
+            </div>
+            
+            <div class="baylot-prize-card">
+                <div class="prize-icon">🏠</div>
+                <h4>Major Prizes</h4>
+                <ul>
+                    <li>Smart home packages</li>
+                    <li>Tech gadget bundles</li>
+                    <li>Designer merchandise</li>
+                    <li>Premium subscriptions</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="baylot-info-box">
+            <h4>🌟 About Baylot Game</h4>
+            <p>Baylot is the first real crypto game offering unprecedented prizes in the blockchain space. 
+               Our transparent system ensures fair draws and instant prize distribution.</p>
+            
+            <div class="baylot-stats">
+                <div class="stat">
+                    <span class="stat-number">$400K+</span>
+                    <span class="stat-label">Total Prize Pool</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">1,111+</span>
+                    <span class="stat-label">Prizes</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Instant Payouts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="prize-info">
+        <h3>ℹ️ How to Claim Your Prize</h3>
+        <ol>
+            <li>Check if your ticket is a winner on the main page</li>
+            <li>Click "Claim Prize" and enter your ticket ID</li>
+            <li>Contact us through Telegram, WhatsApp, or Email</li>
+            <li>Provide your wallet address for BAB or SOL prizes</li>
+            <li>Receive your prize within 24-48 hours</li>
+        </ol>
+        
+        <div class="important-notes">
+            <h4>📝 Important Notes:</h4>
+            <ul>
+                <li>Prizes are distributed in $BAB and $SOL cryptocurrency</li>
+                <li>NFT prizes will be sent to your connected wallet</li>
+                <li>All prizes must be claimed within 7 days</li>
+                <li>Winners are not responsible for any tax implications</li>
             </ul>
         </div>
     </div>
@@ -1732,7 +2712,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const telegramUsername = 't.me/BabaySupport'; // <-- Замените на ваш логин
+        const telegramUsername = 't.me/babaysupport'; // <-- Замените на ваш логин
         const message = `✅ Transaction confirmation:
 Хэш: ${txHash}
 Ссылка: https://solscan.io/tx/${txHash}`;
@@ -1872,6 +2852,312 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Начала функции Ticket Status
+
+
+document.getElementById('ticketStatusForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const ticketNumber = document.getElementById('ticketNumberInput').value.trim();
+    const resultsContainer = document.getElementById('searchResults');
+    
+    if (!ticketNumber) {
+        showNotification('Please enter a ticket number', 'error');
+        return;
+    }
+    
+    // Показываем loading state
+    resultsContainer.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <div style="font-size: 3em; margin-bottom: 15px; animation: pulse 1.5s infinite;">🔍</div>
+            <h3 style="color: #2c3e50; margin-bottom: 10px;">Searching for Ticket...</h3>
+            <p style="color: #7f8c8d;">Looking up ticket <strong>${ticketNumber}</strong> in our database</p>
+            <div style="margin-top: 20px; height: 4px; background: #f0f0f0; border-radius: 2px; overflow: hidden;">
+                <div style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 60%; animation: loading 1.5s infinite;"></div>
+            </div>
+        </div>
+    `;
+    resultsContainer.style.display = 'block';
+    
+    try {
+        // Имитация задержки для лучшего UX
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // ✅ ПРАВИЛЬНЫЙ эндпоинт
+        const response = await fetch(`/tickets/all/html?number=${encodeURIComponent(ticketNumber)}&winners_only=false`);
+        
+        if (response.ok) {
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const successNotification = doc.querySelector('.notification.success');
+            const errorNotification = doc.querySelector('.notification.error');
+            
+            if (successNotification) {
+                // Билет найден - ищем его в гриде с ТОЧНЫМ совпадением
+                const ticketElement = findTicketInGrid(doc, ticketNumber);
+                if (ticketElement) {
+                    displayTicketResult(parseTicketFromElement(ticketElement, ticketNumber));
+                } else {
+                    showTicketNotFound(ticketNumber);
+                }
+            } else if (errorNotification) {
+                showTicketNotFound(ticketNumber);
+            } else {
+                showTicketNotFound(ticketNumber);
+            }
+        } else {
+            showTicketNotFound(ticketNumber);
+        }
+    } catch (error) {
+        showSearchError(error);
+    }
+});
+
+// ✅ ИСПРАВЛЕННАЯ функция - ищет ТОЧНОЕ совпадение
+function findTicketInGrid(doc, ticketNumber) {
+    const tickets = doc.querySelectorAll('.ticket');
+    for (const ticket of tickets) {
+        const ticketNumElement = ticket.querySelector('.ticket-number');
+        if (ticketNumElement) {
+            // Извлекаем только цифры из текста (например: "🎟 Ticket number: 2145" -> "2145")
+            const ticketNumText = ticketNumElement.textContent;
+            const extractedNumber = ticketNumText.replace(/🎟 Ticket number:|\D/g, '').trim();
+            
+            // ✅ Сравниваем ТОЧНОЕ совпадение
+            if (extractedNumber === ticketNumber) {
+                return ticket;
+            }
+        }
+    }
+    return null;
+}
+
+// Функция для парсинга данных билета из HTML элемента
+function parseTicketFromElement(ticketElement, ticketNumber) {
+    const holderInfo = ticketElement.querySelector('.ticket-owner')?.textContent.replace('👤 Owner:', '').trim() || 'Not specified';
+    
+    const countryElement = ticketElement.querySelector('.ticket-owner + p');
+    let countryCode = 'Not specified';
+    if (countryElement && countryElement.textContent.includes('Country:')) {
+        countryCode = countryElement.textContent.split('Country:')[1].trim();
+    }
+    
+    const isWinner = ticketElement.querySelector('.ticket-winner.winner') !== null;
+    let prizeDescription = '';
+    if (isWinner) {
+        const prizeElement = ticketElement.querySelector('.ticket-prize');
+        prizeDescription = prizeElement ? prizeElement.textContent.replace('🎁', '').trim() : 'Prize won';
+    }
+    
+    const socialLinkElement = ticketElement.querySelector('.ticket-owner a[href^="http"]');
+    const socialLink = socialLinkElement ? socialLinkElement.href : '';
+    
+    const walletElement = ticketElement.querySelector('.ticket-owner a[href*="solscan.io"]');
+    const walletAddress = walletElement ? walletElement.href.split('/tx/')[1] : '';
+    
+    return {
+        ticket_number: ticketNumber,
+        holder_info: holderInfo,
+        country_code: countryCode,
+        is_winner: isWinner,
+        prize_description: prizeDescription,
+        social_link: socialLink,
+        wallet_address: walletAddress,
+        created_at: new Date().toISOString(),
+        is_archived: false,
+        is_claimed: false
+    };
+}
+
+// Остальные функции без изменений...
+function displayTicketResult(ticket) {
+    const resultsContainer = document.getElementById('searchResults');
+    const statusClass = getStatusClass(ticket);
+    const statusInfo = getStatusInfo(ticket);
+    
+    resultsContainer.innerHTML = `
+        <div class="ticket-result ${statusClass}">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 1.5em;">🎫 Ticket #${ticket.ticket_number}</h3>
+                    <p style="margin: 5px 0 0 0; color: #7f8c8d;">Registered on ${new Date(ticket.created_at).toLocaleDateString()}</p>
+                </div>
+                <span style="padding: 10px 20px; background: ${statusInfo.color}; color: white; border-radius: 25px; font-weight: bold; font-size: 0.95em;">
+                    ${statusInfo.text} ${statusInfo.emoji}
+                </span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 25px;">
+                <div class="info-card">
+                    <div class="info-icon">👤</div>
+                    <div class="info-content">
+                        <h4>Owner Information</h4>
+                        <p>${ticket.holder_info || 'Not specified'}</p>
+                        ${ticket.social_link ? `<small>Social: <a href="${ticket.social_link}" target="_blank">View profile</a></small>` : ''}
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">🌍</div>
+                    <div class="info-content">
+                        <h4>Location</h4>
+                        <p>${ticket.country_code}</p>
+                    </div>
+                </div>
+                
+                ${ticket.wallet_address ? `
+                <div class="info-card">
+                    <div class="info-icon">💳</div>
+                    <div class="info-content">
+                        <h4>Transaction</h4>
+                        <p><a href="https://solscan.io/tx/${ticket.wallet_address}" target="_blank" style="color: #007bff; text-decoration: none;">View on Solscan</a></p>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            
+            ${ticket.is_winner ? `
+            <div style="margin-top: 25px; padding: 25px; background: rgba(255, 193, 7, 0.2); border-radius: 12px; border-left: 4px solid #ffc107;">
+                <h4 style="margin: 0 0 15px 0; color: #856404; font-size: 1.3em;">🎉 Congratulations! You're a Winner!</h4>
+                <div style="display: grid; gap: 15px;">
+                    <p style="margin: 0; color: #856404;"><strong>🏆 Prize:</strong> ${ticket.prize_description || 'Amazing reward!'}</p>
+                    <p style="margin: 0; color: #856404;"><strong>📅 Won on:</strong> ${new Date(ticket.created_at).toLocaleDateString()}</p>
+                    <div style="margin-top: 15px;">
+                        <button onclick="claimPrize('${ticket.ticket_number}')" style="padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                            🎁 Claim Your Prize
+                        </button>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+function getStatusClass(ticket) {
+    if (ticket.is_winner) return 'winner';
+    if (ticket.is_archived) return 'archived';
+    if (ticket.is_claimed) return 'claimed';
+    return 'active';
+}
+
+function getStatusInfo(ticket) {
+    if (ticket.is_winner) return { text: 'WINNER', emoji: '🏆', color: '#ffc107' };
+    if (ticket.is_archived) return { text: 'ARCHIVED', emoji: '📁', color: '#6c757d' };
+    if (ticket.is_claimed) return { text: 'CLAIMED', emoji: '✅', color: '#17a2b8' };
+    return { text: 'ACTIVE', emoji: '🟢', color: '#28a745' };
+}
+
+function showTicketNotFound(ticketNumber) {
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = `
+        <div class="ticket-result">
+            <div style="text-align: center; padding: 30px;">
+                <div style="font-size: 4em; margin-bottom: 20px;">❌</div>
+                <h3 style="color: #dc3545; margin-bottom: 15px;">Ticket Not Found</h3>
+                <p style="color: #6c757d; margin-bottom: 20px;">We couldn't find a ticket with number: <strong>${ticketNumber}</strong></p>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: left;">
+                    <h4 style="margin: 0 0 10px 0; color: #495057;">💡 Suggestions:</h4>
+                    <ul style="margin: 0; padding-left: 20px; color: #6c757d;">
+                        <li>Check for typos in the ticket number</li>
+                        <li>Ensure you're using the correct format</li>
+                        <li>Contact support if you believe this is an error</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function showSearchError(error) {
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = `
+        <div class="ticket-result">
+            <div style="text-align: center; padding: 30px;">
+                <div style="font-size: 4em; margin-bottom: 20px;">⚠️</div>
+                <h3 style="color: #dc3545; margin-bottom: 15px;">Search Error</h3>
+                <p style="color: #6c757d; margin-bottom: 20px;">Unable to search for ticket. Please try again later.</p>
+                <p style="color: #a0a0a0; font-size: 0.9em;">Error: ${error.message}</p>
+            </div>
+        </div>
+    `;
+}
+
+function claimPrize(ticketNumber) {
+    alert(`Prize claim process initiated for ticket: ${ticketNumber}\n\nYou will be redirected to our support team.`);
+    window.open('https://t.me/babaysupport', '_blank');
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#17a2b8'};
+        color: white;
+        border-radius: 8px;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Добавляем CSS для info-card
+const style = document.createElement('style');
+style.textContent = `
+    .info-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+    }
+    
+    .info-icon {
+        font-size: 2em;
+        flex-shrink: 0;
+    }
+    
+    .info-content h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+        font-size: 0.95em;
+    }
+    
+    .info-content p {
+        margin: 0;
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    .info-content small {
+        color: #6c757d;
+        font-size: 0.85em;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    @keyframes loading {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(200%); }
+    }
+`;
+document.head.appendChild(style);
 </script>
 
 </body>

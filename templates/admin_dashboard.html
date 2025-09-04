@@ -100,81 +100,74 @@
         </div>
     </div>
 
-    {% if winner_tickets %}
-    <h2>🏆 Выигрышные билеты</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Номер билета</th>
-                <th>Владелец</th>
-                <th>Приз</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ticket in winner_tickets %}
-            <tr>
-                <td>{{ ticket.ticket_number }}</td>
-                <td>{{ ticket.holder_info or "Не указан" }}</td>
-                <td>{{ ticket.prize_description or "Не указан" }}</td>
-                <td>
-                    {% if not ticket.is_archived %}
-<form action="/tickets/{{ ticket.id }}/archive?admin_key=MySuperSecretKeyForDeleteAll2133" method="post" style="display: inline;">
-    <button onclick="unarchiveTicket('{{ ticket.id }}')" class="unarchive-btn">📂 Unarchive</button>
-</form>
-                    {% else %}
-                    <form action="/tickets/{{ ticket.id }}/unarchive" method="post" style="display: inline;">
-                        <input type="hidden" name="admin_key" value="MySuperSecretKeyForDeleteAll2133">
-                        <button type="submit" class="unarchive-btn">📂 Unarchive</button>
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Нет выигрышных билетов</p>
-    {% endif %}
+<!-- Добавьте эту секцию в конец файла -->
+{% if winner_tickets %}
+<h2>🏆 Выигрышные билеты</h2>
+<table>
+    <!-- ... существующая таблица ... -->
+</table>
+{% endif %}
 
-    <script>
-function archiveTicket(ticketId) {
-    if (confirm('Архивировать этот билет?')) {
-        fetch(`/tickets/${ticketId}/archive?admin_key=MySuperSecretKeyForDeleteAll2133`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            location.reload();
-        })
-        .catch(error => {
-            alert('Ошибка архивации: ' + error);
+<!-- Новая секция для управления архивом -->
+<div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+    <h2>📦 Управление архивом</h2>
+    
+    <div style="display: flex; gap: 15px; margin-top: 15px;">
+        <!-- Кнопка для удаления всех неархивированных билетов -->
+        <form action="/tickets/all/" method="post" onsubmit="return confirm('Удалить все НЕархивированные билеты?')">
+            <input type="hidden" name="x_admin_key" value="MySuperSecretKeyForDeleteAll2133">
+            <button type="submit" style="background: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+                🗑️ Удалить все активные билеты
+            </button>
+        </form>
+
+        <!-- Кнопка для удаления всех архивных билетов -->
+        <form action="/tickets/archived/all/" method="post" onsubmit="return confirm('ВНИМАНИЕ! Это удалит ВСЕ архивные билеты навсегда. Продолжить?')">
+            <input type="hidden" name="x_admin_key" value="MySuperSecretKeyForDeleteAll2133">
+            <button type="submit" style="background: #ff6b6b; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+                💀 Удалить ВСЕ архивные билеты
+            </button>
+        </form>
+    </div>
+
+    <p style="margin-top: 15px; color: #666; font-size: 14px;">
+        <strong>⚠️ Внимание:</strong> Удаление архивных билетов необратимо. Архивные билеты содержат историческую информацию о победителях.
+    </p>
+</div>
+
+<script>
+// JavaScript для отправки DELETE запросов
+document.addEventListener('DOMContentLoaded', function() {
+    // Обработка форм с методом POST для DELETE запросов
+    const forms = document.querySelectorAll('form[method="post"]');
+    forms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const confirmMessage = this.getAttribute('onsubmit').includes('confirm') ? 
+                this.getAttribute('onsubmit').match(/confirm\('([^']+)'/)[1] : 
+                'Вы уверены?';
+            
+            if (!confirm(confirmMessage)) return;
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Admin-Key': formData.get('x_admin_key')
+                    }
+                });
+                
+                const result = await response.json();
+                alert(result.message || result.detail);
+                location.reload();
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
         });
-    }
-}
-
-function unarchiveTicket(ticketId) {
-    if (confirm('Восстановить этот билет из архива?')) {
-        fetch(`/tickets/${ticketId}/unarchive?admin_key=MySuperSecretKeyForDeleteAll2133`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            location.reload();
-        })
-        .catch(error => {
-            alert('Ошибка восстановления: ' + error);
-        });
-    }
-}
-
-.then(data => {
-    alert(data.message);
-    location.reload();  // ← Добавьте эту строку
-})
+    });
+});
 </script>
-
 </body>
 </html>
