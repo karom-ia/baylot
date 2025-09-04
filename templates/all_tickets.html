@@ -1065,6 +1065,151 @@
             gap: 20px;
             margin-top: 20px;
         }
+
+/* Раздел архив */
+.archiv-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin: 25px 0;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.feature-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.archived-tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 25px 0;
+}
+
+.archived-ticket-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #007bff;
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.ticket-number {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.winner-badge {
+    background: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+
+.ticket-details p {
+    margin: 8px 0;
+    color: #555;
+}
+
+.transaction-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.transaction-link:hover {
+    text-decoration: underline;
+}
+
+.social-button {
+    display: inline-block;
+    background: #6c757d;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.social-button:hover {
+    background: #5a6268;
+}
+
+.empty-archive {
+    text-align: center;
+    padding: 50px 20px;
+    color: #6c757d;
+}
+
+.archive-footer {
+    margin-top: 40px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #6f42c1;
+}
+
+.technology-info {
+    margin-top: 20px;
+}
+
+.technology-info ul {
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+}
+
+.technology-info li {
+    margin: 8px 0;
+    break-inside: avoid;
+}
+/* END Раздел архив */
     </style>
 </head>
 <body>
@@ -1213,23 +1358,123 @@
 <!-- Контент для страницы Archiv -->
 <div class="page-content">
     <h2>📚 Archiv</h2>
+    <p>Explore the history of past winners and archived tickets from previous draws.</p>
     
-    {% if archived_tickets %}
-        {% for ticket in archived_tickets %}
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-            <strong>🏆 Winner: {{ ticket.ticket_number }}</strong><br>
-            <strong>👤 Owner:</strong> {{ ticket.holder_info or "Unknown" }}<br>
-            {% if ticket.prize_description %}
-            <strong>🎁 Prize:</strong> {{ ticket.prize_description }}<br>
-            {% endif %}
-            {% if ticket.archived_at %}
-            <strong>📅 Archived:</strong> {{ ticket.archived_at.strftime('%b %d, %Y') }}<br>
-            {% endif %}
+    <div class="archiv-info">
+        <h3>🏆 Historical Archive</h3>
+        <p>Our archive preserves the history of all winning tickets and past draws, creating a transparent and verifiable record of every prize distribution.</p>
+        
+        <div class="features-grid">
+            <div class="feature-item">
+                <h4>🔍 Transparency</h4>
+                <p>Every archived ticket is permanently recorded and publicly verifiable</p>
+            </div>
+            <div class="feature-item">
+                <h4>📊 Complete History</h4>
+                <p>Access the full history of winners and prize distributions</p>
+            </div>
+            <div class="feature-item">
+                <h4>⏰ Permanent Record</h4>
+                <p>Archived tickets remain accessible for future reference</p>
+            </div>
         </div>
-        {% endfor %}
+    </div>
+
+    <h3>📈 Archive Statistics</h3>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-number">{{ archived_tickets|length }}</span>
+            <span class="stat-label">Total Archived Tickets</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ archived_tickets|selectattr("is_winner")|list|length }}</span>
+            <span class="stat-label">Winning Tickets</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ (archived_tickets|selectattr("prize_description")|list|length) if archived_tickets else 0 }}</span>
+            <span class="stat-label">With Prizes</span>
+        </div>
+    </div>
+
+    <h3>🏆 Historical Winners</h3>
+    
+    <!-- Debug информация (можно удалить после тестирования) -->
+    <div style="background: #f0f8ff; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+        <small>Debug: archived_tickets count = {{ archived_tickets|length }}</small><br>
+        <small>Debug: archiv_page = {{ archiv_page }}</small>
+    </div>
+
+    {% if archived_tickets %}
+        <div class="archived-tickets-grid">
+            {% for ticket in archived_tickets %}
+            <div class="archived-ticket-card">
+                <div class="ticket-header">
+                    <span class="ticket-number">🎫 {{ ticket.ticket_number }}</span>
+                    {% if ticket.is_winner %}
+                    <span class="winner-badge">🏆 Winner</span>
+                    {% endif %}
+                </div>
+                
+                <div class="ticket-details">
+                    <p><strong>👤 Owner:</strong> {{ ticket.holder_info or "Unknown" }}</p>
+                    
+                    {% if ticket.prize_description %}
+                    <p><strong>🎁 Prize:</strong> {{ ticket.prize_description }}</p>
+                    {% endif %}
+                    
+                    {% if ticket.country_code %}
+                    <p><strong>🌍 Country:</strong> {{ ticket.country_code|get_flag }} {{ ticket.country_code|country_name }}</p>
+                    {% endif %}
+                    
+                    {% if ticket.archived_at %}
+                    <p><strong>📅 Archived:</strong> {{ ticket.archived_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% endif %}
+                    
+                    {% if ticket.wallet_address %}
+                    <p><strong>💳 Transaction:</strong> 
+                        <a href="https://solscan.io/tx/{{ ticket.wallet_address }}" target="_blank" class="transaction-link">
+                            View on Solscan
+                        </a>
+                    </p>
+                    {% endif %}
+                </div>
+                
+                {% if ticket.social_link %}
+                <div class="social-link">
+                    <a href="https://{{ ticket.social_link }}" target="_blank" class="social-button">
+                        🔗 Social Media
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>No archived tickets yet.</p>
+        <div class="empty-archive">
+            <div style="text-align: center; padding: 40px;">
+                <h3>📭 Archive is Empty</h3>
+                <p>No tickets have been archived yet. Archived winning tickets will appear here.</p>
+                <div style="margin-top: 20px;">
+                    <small>Check back after the next draw to see historical winners!</small>
+                </div>
+            </div>
+        </div>
     {% endif %}
+
+    <div class="archive-footer">
+        <h3>ℹ️ About Our Archive</h3>
+        <p>The Metabase archive serves as a permanent, transparent record of all winning tickets and prize distributions. Built on blockchain technology, every archived ticket is cryptographically verified and permanently stored.</p>
+        
+        <div class="technology-info">
+            <h4>🔧 Technology Stack:</h4>
+            <ul>
+                <li>PostgreSQL Database for reliable storage</li>
+                <li>FastAPI backend for high performance</li>
+                <li>Blockchain verification for transparency</li>
+                <li>SOLana integration for crypto transactions</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
     {% else %}
