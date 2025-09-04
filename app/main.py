@@ -49,9 +49,7 @@ def get_country_name(code: str):
     return country_name_map.get(code.upper(), code)
 templates.env.filters["country_name"] = get_country_name
 
-# Пересоздаем таблицы с нуля
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
+
 
 app.include_router(ticket.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
