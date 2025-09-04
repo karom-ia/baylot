@@ -6,7 +6,8 @@ from app.database.db import Base, engine, get_db
 from app.models.ticket import Ticket
 from app.routers import ticket
 from app.utils.country_names import country_name_map
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 import secrets
@@ -14,7 +15,6 @@ import logging
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-import sqlalchemy as sa
 
 # Загружаем переменные окружения
 env_path = Path(__file__).parent.parent / '.env'
@@ -50,8 +50,6 @@ def get_country_name(code: str):
     return country_name_map.get(code.upper(), code)
 templates.env.filters["country_name"] = get_country_name
 
-
-
 app.include_router(ticket.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
@@ -67,7 +65,7 @@ def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
 @app.get("/")
 async def read_root(
     request: Request, 
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     status: bool = False,
     support: bool = False,
     about: bool = False,
@@ -75,11 +73,16 @@ async def read_root(
     prizes: bool = False
 ):
     # Активные билеты (неархивированные)
-    tickets = db.query(Ticket).filter(Ticket.is_archived == False).order_by(Ticket.created_at.desc()).all()
-    featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True, Ticket.is_archived == False).all()
+    result = await db.execute(select(Ticket).filter(Ticket.is_archived == False).order_by(Ticket.created_at.desc()))
+    tickets = result.scalars().all()
+    
+    # Избранные билеты
+    result = await db.execute(select(Ticket).filter(Ticket.is_featured == True, Ticket.is_archived == False))
+    featured_tickets = result.scalars().all()
     
     # Архивные билеты
-    archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()).all()
+    result = await db.execute(select(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()))
+    archived_tickets = result.scalars().all()
     
     # Отладочная информация
     logger.info(f"Active tickets: {len(tickets)}, Archived tickets: {len(archived_tickets)}")
@@ -103,7 +106,7 @@ async def read_root(
 @app.get("/tickets/all/html")
 async def get_all_tickets_html(
     request: Request,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     number: str = None,
     winners_only: bool = False,
     status: bool = False,
@@ -112,27 +115,26 @@ async def get_all_tickets_html(
     archiv: bool = False,
     prizes: bool = False
 ):
-    # Фильтруем только НЕархивированные билеты
-    query = db.query(Ticket).filter(Ticket.is_archived == False)
+    # Базовый запрос
+    stmt = select(Ticket).filter(Ticket.is_archived == False)
     
     if number:
-        query = query.filter(Ticket.ticket_number.ilike(f"%{number}%"))
+        stmt = stmt.filter(Ticket.ticket_number.ilike(f"%{number}%"))
     
     if winners_only:
-        query = query.filter(Ticket.is_winner == True)
+        stmt = stmt.filter(Ticket.is_winner == True)
     
-    tickets = query.order_by(Ticket.created_at.desc()).all()
+    # Выполняем запрос
+    result = await db.execute(stmt.order_by(Ticket.created_at.desc()))
+    tickets = result.scalars().all()
     
-    # Избранные билеты тоже только неархивированные
-    featured_tickets = db.query(Ticket).filter(
-        Ticket.is_featured == True, 
-        Ticket.is_archived == False
-    ).all()
+    # Избранные билеты
+    result = await db.execute(select(Ticket).filter(Ticket.is_featured == True, Ticket.is_archived == False))
+    featured_tickets = result.scalars().all()
     
-    # Архивные билеты для страницы Archiv
-    archived_tickets = db.query(Ticket).filter(
-        Ticket.is_archived == True
-    ).order_by(Ticket.archived_at.desc()).all()
+    # Архивные билеты
+    result = await db.execute(select(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()))
+    archived_tickets = result.scalars().all()
     
     found = None
     if number:
@@ -154,8 +156,10 @@ async def get_all_tickets_html(
     })
 
 @app.get("/admin")
-async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
-    winner_tickets = db.query(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.created_at.desc()).all()
+async def admin_dashboard(request: Request, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Ticket).filter(Ticket.is_winner == True).order_by(Ticket.created_at.desc()))
+    winner_tickets = result.scalars().all()
+    
     return templates.TemplateResponse("admin_dashboard.html", {
         "request": request,
         "winner_tickets": winner_tickets
@@ -163,17 +167,29 @@ async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
 
 # Эндпоинт для получения архивных билетов (API)
 @app.get("/archived-tickets")
-async def get_archived_tickets_api(db: Session = Depends(get_db)):
-    archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()).all()
+async def get_archived_tickets_api(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()))
+    archived_tickets = result.scalars().all()
     return archived_tickets
 
 # Эндпоинт для статистики
 @app.get("/stats")
-async def get_stats(db: Session = Depends(get_db)):
-    total_tickets = db.query(Ticket).count()
-    winner_tickets = db.query(Ticket).filter(Ticket.is_winner == True).count()
-    archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).count()
-    featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True).count()
+async def get_stats(db: AsyncSession = Depends(get_db)):
+    # Общее количество билетов
+    result = await db.execute(select(Ticket))
+    total_tickets = len(result.scalars().all())
+    
+    # Победители
+    result = await db.execute(select(Ticket).filter(Ticket.is_winner == True))
+    winner_tickets = len(result.scalars().all())
+    
+    # Архивные
+    result = await db.execute(select(Ticket).filter(Ticket.is_archived == True))
+    archived_tickets = len(result.scalars().all())
+    
+    # Избранные
+    result = await db.execute(select(Ticket).filter(Ticket.is_featured == True))
+    featured_tickets = len(result.scalars().all())
     
     return {
         "total_tickets": total_tickets,
