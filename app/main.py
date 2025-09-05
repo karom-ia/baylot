@@ -18,8 +18,8 @@ from pathlib import Path
 load_dotenv()
 
 # Переменные окружения с значениями по умолчанию
-DOCS_USERNAME = os.getenv("DOCS_USERNAME")
-DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
+DOCS_USERNAME = os.getenv("DOCS_USERNAME", "admin")
+DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "secre123")
 
 security = HTTPBasic()
 
@@ -59,14 +59,16 @@ async def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
         title="Metabase API Docs",
-        swagger_favicon_url="/static/favicon.ico"
+        swagger_favicon_url="/static/favicon.ico",
+        swagger_ui_parameters={"syntaxHighlight.theme": "monokai"}
     )
 
 @app.get("/redoc", include_in_schema=False)
 async def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return get_redoc_html(
         openapi_url=app.openapi_url,
-        title="Metabase API Redoc"
+        title="Metabase API Redoc",
+        redoc_favicon_url="/static/favicon.ico"
     )
 
 # Явный endpoint для OpenAPI JSON
