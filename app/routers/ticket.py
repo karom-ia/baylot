@@ -92,7 +92,7 @@ async def check_transaction(tx_hash: str):
 @router.post("/create")
 async def create_ticket(
     request: Request,
-    admin_key: str = Query(...),
+    admin_key: str = Form(...),  # ИЗМЕНЕНО: с Query на Form
     ticket_number: str = Form(...),
     holder_info: str = Form(None),
     social_link: str = Form(None),
@@ -100,7 +100,6 @@ async def create_ticket(
     country_code: str = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
-
 ):
     if admin_key != ADMIN_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -503,7 +502,7 @@ def get_ticket_count(db: Session = Depends(get_db)):
 
 @router.get("/create", response_class=HTMLResponse)
 def create_ticket_form(request: Request):
-    return templates.TemplateResponse("create_ticket.html", {"request": request, "admin_key": ADMIN_KEY})
+    return templates.TemplateResponse("create_ticket.html", {"request": request})
 
 @router.get("/last_ticket", response_model=TicketSchema)
 def get_last_ticket(db: Session = Depends(get_db)):
