@@ -17,7 +17,7 @@ from pathlib import Path
 # Загружаем переменные из .env
 load_dotenv()
 
-# Переменные окружения
+# Переменные окружения с значениями по умолчанию
 DOCS_USERNAME = os.getenv("DOCS_USERNAME")
 DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
 
@@ -36,27 +36,48 @@ def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
 app = FastAPI(
     docs_url=None,
     redoc_url=None,
+    openapi_url="/api/openapi.json",  # Явно указываем OpenAPI URL
+    title="Metabase API",
+    description="API для системы тикетов Metabase",
+    version="1.0.0"
 )
 
 def get_country_name(code: str):
     return country_name_map.get(code.upper(), code)
 templates.env.filters["country_name"] = get_country_name
 
-# Пересоздаем таблицы с нуля
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
+# УБЕРИТЕ пересоздание таблиц на продакшене - это только для разработки!
+# Base.metadata.drop_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app.include_router(ticket.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploaded_tickets", StaticFiles(directory="uploaded_tickets"), name="uploaded_tickets")
 
 @app.get("/docs", include_in_schema=False)
-def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs)):
-    return get_swagger_ui_html(openapi_url=app.openapi_url, title="Metabase API Docs")
+async def custom_swagger_ui(credentials: HTTPBasicCredentials = Depends(protect_docs)):
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title="Metabase API Docs",
+        swagger_favicon_url="/static/favicon.ico"
+    )
 
 @app.get("/redoc", include_in_schema=False)
-def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
-    return get_redoc_html(openapi_url=app.openapi_url, title="Metabase API Redoc")
+async def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)):
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title="Metabase API Redoc"
+    )
+
+# Явный endpoint для OpenAPI JSON
+@app.get("/api/openapi.json", include_in_schema=False)
+async def get_openapi(credentials: HTTPBasicCredentials = Depends(protect_docs)):
+    return app.openapi()
+
+# Health check endpoint для Render
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "message": "Metabase API is running"}
 
 @app.get("/")
 async def read_root(
