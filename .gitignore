@@ -1,7 +1,8 @@
-.env
-.env.local
-.env.production
+# 👉 Игнорируем .env-файлы со всеми вариациями
+.env*
 *.env
+
+# 👉 Python кеши и виртуальные окружения
 __pycache__/
 *.pyc
 *.pyo
@@ -12,12 +13,20 @@ venv/
 ENV/
 instance/
 .pytest_cache/
+
+# 👉 Тесты и покрытия
 .coverage
 htmlcov/
+
+# 👉 Сборки Python
 dist/
 build/
 *.egg-info/
+
+# 👉 Системные файлы
 .DS_Store
 Thumbs.db
+
+# 👉 Загруженные изображения билетов, кроме gitkeep
 uploaded_tickets/*
 !uploaded_tickets/.gitkeep

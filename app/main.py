@@ -10,15 +10,16 @@ from app.utils.country_names import country_name_map
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 import secrets
-import logging  # Добавлено для отладки
+import os
+from dotenv import load_dotenv
 
-# Настройка логирования
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Загружаем переменные из .env
+load_dotenv()
 
-# Жёстко прописанные логин и пароль
-DOCS_USERNAME = "admin"
-DOCS_PASSWORD = "secre123"
+# Переменные окружения
+DOCS_USERNAME = os.getenv("DOCS_USERNAME")
+DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
+
 security = HTTPBasic()
 
 def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
@@ -64,24 +65,17 @@ async def read_root(
     support: bool = False,
     about: bool = False,
     archiv: bool = False,
-    prizes: bool = False  # Добавляем новый параметр
+    prizes: bool = False
 ):
-    # Активные билеты (неархивированные)
     tickets = db.query(Ticket).filter(Ticket.is_archived == False).order_by(Ticket.created_at.desc()).all()
     featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True, Ticket.is_archived == False).all()
-    
-    # Архивные билеты
     archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()).all()
-    
-    # Отладочная информация
-    logger.info(f"Active tickets: {len(tickets)}, Archived tickets: {len(archived_tickets)}")
-    logger.info(f"Archived tickets IDs: {[str(t.id) for t in archived_tickets]}")
     
     return templates.TemplateResponse("all_tickets.html", {
         "request": request,
         "tickets": tickets,
         "featured_tickets": featured_tickets,
-        "archived_tickets": archived_tickets,  # Передаем архивные билеты
+        "archived_tickets": archived_tickets,
         "number": None,
         "winners_only": False,
         "found": None,
@@ -89,7 +83,7 @@ async def read_root(
         "support_page": support,
         "about_page": about,
         "archiv_page": archiv,
-        "prizes_page": prizes  # Добавляем новый параметр
+        "prizes_page": prizes
     })
 
 @app.get("/tickets/all/html")
@@ -102,9 +96,8 @@ async def get_all_tickets_html(
     support: bool = False,
     about: bool = False,
     archiv: bool = False,
-    prizes: bool = False  # Добавляем новый параметр
+    prizes: bool = False
 ):
-    # Фильтруем только НЕархивированные билеты
     query = db.query(Ticket).filter(Ticket.is_archived == False)
     
     if number:
@@ -115,13 +108,11 @@ async def get_all_tickets_html(
     
     tickets = query.order_by(Ticket.created_at.desc()).all()
     
-    # Избранные билеты тоже только неархивированные
     featured_tickets = db.query(Ticket).filter(
         Ticket.is_featured == True, 
         Ticket.is_archived == False
     ).all()
     
-    # Архивные билеты для страницы Archiv
     archived_tickets = db.query(Ticket).filter(
         Ticket.is_archived == True
     ).order_by(Ticket.archived_at.desc()).all()
@@ -142,7 +133,7 @@ async def get_all_tickets_html(
         "support_page": support,
         "about_page": about,
         "archiv_page": archiv,
-        "prizes_page": prizes  # Добавляем новый параметр
+        "prizes_page": prizes
     })
 
 @app.get("/admin")
@@ -153,13 +144,11 @@ async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
         "winner_tickets": winner_tickets
     })
 
-# Эндпоинт для получения архивных билетов (API)
 @app.get("/archived-tickets")
 async def get_archived_tickets_api(db: Session = Depends(get_db)):
     archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()).all()
     return archived_tickets
 
-# Эндпоинт для статистики
 @app.get("/stats")
 async def get_stats(db: Session = Depends(get_db)):
     total_tickets = db.query(Ticket).count()
