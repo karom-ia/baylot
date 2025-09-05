@@ -6,12 +6,13 @@ from app.database.db import Base, engine, get_db
 from app.models.ticket import Ticket
 from app.routers import ticket
 from app.utils.country_names import country_name_map
-
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 import secrets
+import logging
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Загружаем переменные из .env
 load_dotenv()
