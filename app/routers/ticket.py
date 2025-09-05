@@ -503,7 +503,7 @@ def get_ticket_count(db: Session = Depends(get_db)):
 
 @router.get("/create", response_class=HTMLResponse)
 def create_ticket_form(request: Request):
-    return templates.TemplateResponse("create_ticket.html", {"request": request})
+    return templates.TemplateResponse("create_ticket.html", {"request": request, "admin_key": ADMIN_KEY})
 
 @router.get("/last_ticket", response_model=TicketSchema)
 def get_last_ticket(db: Session = Depends(get_db)):
