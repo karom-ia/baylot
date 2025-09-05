@@ -19,12 +19,21 @@ from app.utils.template_engine import templates
 from app.schemas.ticket import TicketSchema
 from starlette.status import HTTP_303_SEE_OTHER
 
-# Загружаем переменные из .env
+# ✅ Явно загружаем .env файл
 load_dotenv()
 
 # 🔐 Секреты из .env
 ADMIN_KEY = os.getenv("ADMIN_KEY")
 SOLANA_WALLET_ADDRESS = os.getenv("SOLANA_WALLET_ADDRESS")
+
+# ✅ Добавляем проверку
+if not ADMIN_KEY:
+    raise ValueError("ADMIN_KEY not found in environment variables")
+if not SOLANA_WALLET_ADDRESS:
+    raise ValueError("SOLANA_WALLET_ADDRESS not found in environment variables")
+
+print(f"✅ ADMIN_KEY loaded: {ADMIN_KEY is not None}")
+print(f"✅ SOLANA_WALLET_ADDRESS: {SOLANA_WALLET_ADDRESS}")
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 UPLOAD_DIR = "uploaded_tickets"
@@ -37,62 +46,11 @@ def get_db():
     finally:
         db.close()
 
-# ✅ Новый маршрут для проверки транзакции
-@router.get("/check-transaction")
-async def check_transaction(tx_hash: str):
-    """
-    Проверяет транзакцию в блокчейне Solana на валидность.
-    """
-    SOLANA_API_URL = "https://api.mainnet-beta.solana.com"
-    required_amount_lamports = 500_000_000  # 1 SOL = 1,000,000,000 Lamports
-
-    if not tx_hash:
-        raise HTTPException(status_code=400, detail="Transaction hash is missing.")
-    
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                SOLANA_API_URL,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 1,
-                    "method": "getConfirmedTransaction",
-                    "params": [tx_hash]
-                }
-            )
-            response.raise_for_status()
-            tx_data = response.json().get("result")
-
-            if not tx_data:
-                raise HTTPException(status_code=404, detail="Transaction not found.")
-
-            # Проверка получателя и суммы
-            # Ищем, была ли транзакция на наш кошелёк с правильной суммой
-            is_valid = False
-            for instruction in tx_data['transaction']['message']['instructions']:
-                if (
-                    instruction.get('programId') == '11111111111111111111111111111111'
-                    and instruction.get('parsed', {}).get('info', {}).get('destination') == SOLANA_WALLET_ADDRESS
-                    and instruction.get('parsed', {}).get('info', {}).get('lamports') >= required_amount_lamports
-                ):
-                    is_valid = True
-                    break
-
-            if is_valid:
-                return {"status": "success", "detail": "Transaction is valid."}
-            else:
-                raise HTTPException(status_code=400, detail="Transaction is not valid or does not meet the requirements (1 SOL to the correct address).")
-
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=f"HTTP Error: {e.response.text}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
-
-
+# ✅ Добавляем отладочную информацию
 @router.post("/create")
 async def create_ticket(
     request: Request,
-    admin_key: str = Form(...),  # ИЗМЕНЕНО: с Query на Form
+    admin_key: str = Form(...),
     ticket_number: str = Form(...),
     holder_info: str = Form(None),
     social_link: str = Form(None),
@@ -101,9 +59,15 @@ async def create_ticket(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+    print(f"🔑 Received admin_key: '{admin_key}'")
+    print(f"🔑 Expected ADMIN_KEY: '{ADMIN_KEY}'")
+    print(f"✅ Match: {admin_key == ADMIN_KEY}")
+    
     if admin_key != ADMIN_KEY:
+        print("❌ ACCESS DENIED: Admin keys don't match!")
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+    # Остальной код без изменений...
     filename = secure_filename(f"{uuid4().hex}_{file.filename}")
     file_path = os.path.join(UPLOAD_DIR, filename)
     with open(file_path, "wb") as buffer:
@@ -124,7 +88,6 @@ async def create_ticket(
     db.commit()
     db.refresh(new_ticket)
 
-    # 👉 Определим по заголовку, что ожидается: HTML или JSON
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse("ticket_success.html", {
             "request": request,
@@ -144,7 +107,6 @@ async def create_ticket(
             "prize_description": new_ticket.prize_description,
             "created_at": new_ticket.created_at.isoformat(),
         })
-
 @router.post("/{ticket_id}/archive")
 def archive_ticket(
     ticket_id: UUID,
