@@ -11,29 +11,15 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 import httpx
-from dotenv import load_dotenv
 
 from app.database.db import SessionLocal
 from app.models.ticket import Ticket
 from app.utils.template_engine import templates
 from app.schemas.ticket import TicketSchema
-from starlette.status import HTTP_303_SEE_OTHER
 
-# ✅ Явно загружаем .env файл
-load_dotenv()
-
-# 🔐 Секреты из .env
-ADMIN_KEY = os.getenv("ADMIN_KEY")
-SOLANA_WALLET_ADDRESS = os.getenv("SOLANA_WALLET_ADDRESS")
-
-# ✅ Добавляем проверку
-if not ADMIN_KEY:
-    raise ValueError("ADMIN_KEY not found in environment variables")
-if not SOLANA_WALLET_ADDRESS:
-    raise ValueError("SOLANA_WALLET_ADDRESS not found in environment variables")
-
-print(f"✅ ADMIN_KEY loaded: {ADMIN_KEY is not None}")
-print(f"✅ SOLANA_WALLET_ADDRESS: {SOLANA_WALLET_ADDRESS}")
+# 🔐 Секреты из environment variables
+ADMIN_KEY = os.getenv("ADMIN_KEY", "MySuperSecretKeyForDeleteAll2133")
+SOLANA_WALLET_ADDRESS = os.getenv("SOLANA_WALLET_ADDRESS", "4NuDayX7fiZT4Teo9HGBNqCRKNV6bRsPFAY6JkjYC9rN")
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 UPLOAD_DIR = "uploaded_tickets"
