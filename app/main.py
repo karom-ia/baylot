@@ -14,12 +14,21 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Загружаем переменные из .env
 load_dotenv()
 
 # Переменные окружения с значениями по умолчанию
-DOCS_USERNAME = os.getenv("DOCS_USERNAME")
-DOCS_PASSWORD = os.getenv("DOCS_PASSWORD")
+DOCS_USERNAME = os.getenv("DOCS_USERNAME", "admin")
+DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "secre123")
+ADMIN_KEY = os.getenv("ADMIN_KEY")
+SOLANA_WALLET_ADDRESS = os.getenv("SOLANA_WALLET_ADDRESS")
+
+logger.info(f"ADMIN_KEY loaded: {ADMIN_KEY is not None}")
+logger.info(f"SOLANA_WALLET_ADDRESS: {SOLANA_WALLET_ADDRESS}")
 
 security = HTTPBasic()
 
@@ -36,19 +45,25 @@ def protect_docs(credentials: HTTPBasicCredentials = Depends(security)):
 app = FastAPI(
     docs_url=None,
     redoc_url=None,
-    openapi_url="/api/openapi.json",  # Явно указываем OpenAPI URL
+    openapi_url="/api/openapi.json",
     title="Metabase API",
     description="API для системы тикетов Metabase",
     version="1.0.0"
 )
 
+# Middleware для логирования ошибок
+@app.middleware("http")
+async def log_errors(request: Request, call_next):
+    try:
+        response = await call_next(request)
+        return response
+    except Exception as e:
+        logger.error(f"Error processing request {request.url}: {str(e)}")
+        raise
+
 def get_country_name(code: str):
     return country_name_map.get(code.upper(), code)
 templates.env.filters["country_name"] = get_country_name
-
-# УБЕРИТЕ пересоздание таблиц на продакшене - это только для разработки!
-# Base.metadata.drop_all(bind=engine)
-# Base.metadata.create_all(bind=engine)
 
 app.include_router(ticket.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -69,12 +84,10 @@ async def custom_redoc(credentials: HTTPBasicCredentials = Depends(protect_docs)
         title="Metabase API Redoc"
     )
 
-# Явный endpoint для OpenAPI JSON
 @app.get("/api/openapi.json", include_in_schema=False)
 async def get_openapi(credentials: HTTPBasicCredentials = Depends(protect_docs)):
     return app.openapi()
 
-# Health check endpoint для Render
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "message": "Metabase API is running"}
@@ -89,24 +102,28 @@ async def read_root(
     archiv: bool = False,
     prizes: bool = False
 ):
-    tickets = db.query(Ticket).filter(Ticket.is_archived == False).order_by(Ticket.created_at.desc()).all()
-    featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True, Ticket.is_archived == False).all()
-    archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()).all()
-    
-    return templates.TemplateResponse("all_tickets.html", {
-        "request": request,
-        "tickets": tickets,
-        "featured_tickets": featured_tickets,
-        "archived_tickets": archived_tickets,
-        "number": None,
-        "winners_only": False,
-        "found": None,
-        "status_page": status,
-        "support_page": support,
-        "about_page": about,
-        "archiv_page": archiv,
-        "prizes_page": prizes
-    })
+    try:
+        tickets = db.query(Ticket).filter(Ticket.is_archived == False).order_by(Ticket.created_at.desc()).all()
+        featured_tickets = db.query(Ticket).filter(Ticket.is_featured == True, Ticket.is_archived == False).all()
+        archived_tickets = db.query(Ticket).filter(Ticket.is_archived == True).order_by(Ticket.archived_at.desc()).all()
+        
+        return templates.TemplateResponse("all_tickets.html", {
+            "request": request,
+            "tickets": tickets,
+            "featured_tickets": featured_tickets,
+            "archived_tickets": archived_tickets,
+            "number": None,
+            "winners_only": False,
+            "found": None,
+            "status_page": status,
+            "support_page": support,
+            "about_page": about,
+            "archiv_page": archiv,
+            "prizes_page": prizes
+        })
+    except Exception as e:
+        logger.error(f"Error in read_root: {str(e)}")
+        raise
 
 @app.get("/tickets/all/html")
 async def get_all_tickets_html(
